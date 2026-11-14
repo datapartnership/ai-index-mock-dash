@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Stakeholder Questions | Global AI Adoption Index</title>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/design-system.css">
+<link rel="stylesheet" href="css/questions.css">
+<!-- React is loaded by the dc runtime; point it at the local copies instead of the CDN -->
+<script>window.__resources = {"https://unpkg.com/react@18.3.1/umd/react.production.min.js": "js/vendor/react.v18.3.1.production.min.js", "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js": "js/vendor/react-dom.v18.3.1.production.min.js"};</script>
+<script src="js/design-system.js"></script>
+<script src="js/vendor/d3.v7.9.2.min.js"></script>
+<script src="js/vendor/topojson-client.v3.1.0.min.js"></script>
+<script src="js/vendor/chart.umd.v4.4.0.min.js"></script>
+<script src="data/world-topology.js"></script>
+<script src="js/dashboard-engine.js"></script>
+<script src="js/dc-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet></helmet>
+
+<div ref="{{ rootRef }}" style="min-height:100vh;background:var(--gray-97);font-family:var(--font-body);color:var(--gray-21);line-height:1.6;">
+
+  <div style="background:var(--orange-57);color:var(--blue-12);font-weight:500;font-size:0.9375rem;padding:0.5rem 1rem;text-align:center;">
+    Illustrative mock-up. Index figures and chart values are invented to show layout. Figures marked as published are real and linked to their source.
+  </div>
+
+  <x-import component-from-global-scope="WorldBankGroupDesignSystem_53b2b3.GlobalNav" brand="Global AI Adoption Index" items="{{ navItems }}" style="position:sticky;top:0;z-index:100;" hint-size="100%,60px"></x-import>
+
+  <header id="top" style="background:var(--gray-97);border-bottom:1px solid var(--gray-91);">
+    <div style="max-width:1280px;margin:0 auto;padding:2.5rem 2rem 2.25rem;">
+      <div style="font-family:var(--font-body);font-size:0.8125rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-36);margin-bottom:0.75rem;">Global AI Adoption Index</div>
+      <h1 style="font-family:var(--font-display);font-size:3rem;line-height:3.25rem;font-weight:400;color:var(--blue-12);margin:0 0 1rem;">Stakeholder Questions</h1>
+      <p style="font-family:var(--font-body);font-size:1.125rem;line-height:1.8125rem;color:var(--gray-21);max-width:820px;margin:0 0 1rem;">The World Bank conducted a global expert survey of 164 development practitioners and led focus groups and interviews with more than 70 experts from international organizations, including the African Development Bank, Inter-American Development Bank, UNICEF, OECD, and others. Based on these inputs, the Bank has compiled 222 test questions for the Index to answer related to AI policy and investment prioritization. Following are eight examples, illustrated through a fictional country by combining Index outputs with supplemental datasets.</p>
+      <a href="index.html" style="font-family:var(--font-body);font-size:0.9375rem;font-weight:600;color:var(--blue-45);text-decoration:none;"><i class="loop loop-angle-left" aria-hidden="true"></i> Back to the Global AI Adoption Index</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="questions" style="background:var(--gray-97);border-bottom:1px solid var(--gray-91);padding:2.5rem 2rem 3rem;">
+      <div class="qx-wrap" id="qx-root">
+
+        <div class="qx-cbar"><div><b>The example country: Country X</b><span>Every answer below describes this one country. All Index and supplemental values are invented. The only comparisons are with regional and OECD aggregates.</span></div></div>
+
+        <div class="qx-flow" aria-label="How each question is answered">
+          <div><span class="qx-num">1</span><b>What we ask of the data</b>Each stakeholder question becomes questions the data can answer.</div>
+          <div><span class="qx-num">2</span><b>Data we combine</b>Index measures, plus supplemental data from outside the Index.</div>
+          <div><span class="qx-num">3</span><b>What the answer looks like</b>Charts for the example country, built from Index and supplemental data.</div>
+          <div><span class="qx-num">4</span><b>What to do with it</b>The policy or investment decision it informs, and what the Index cannot tell you.</div>
+        </div>
+
+        <h2 style="font-family:var(--font-display);font-size:1.75rem;line-height:2.125rem;font-weight:400;color:var(--blue-12);margin:2.5rem 0 0.35rem;">Which parts of the Index each question uses</h2>
+        <p style="margin:0;max-width:760px;color:var(--gray-36);">The Index was designed so one set of measures can be sliced many ways. Open a question to see how its answer is built.</p>
+        <div class="qx-legend" aria-label="Legend">
+          <span><span class="qx-sq" style="width:14px;height:14px;background:#34539f;"></span>Consumer activity</span>
+          <span><span class="qx-sq" style="width:14px;height:14px;background:var(--orange-46);"></span>API usage</span>
+          <span><span class="qx-sq" style="width:14px;height:14px;background:linear-gradient(90deg,#34539f 50%,var(--orange-46) 50%);"></span>Both</span>
+          <span><span class="qx-sq" style="width:14px;height:14px;background:var(--gray-44);"></span>Supplemental, outside the Index</span>
+        </div>
+
+        <div class="qx-mx" id="qx-matrix"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="background:var(--blue-12);color:rgba(255,255,255,0.6);padding:2rem 2rem 1.5rem;">
+    <div style="max-width:1280px;margin:0 auto;">
+      <p style="font-size:0.875rem;margin:0 0 0.4rem;">Mock dashboard for design review. Classification labels (O*NET, ISCO, ISIC) are shortened or paraphrased for layout.</p>
+      <p style="font-size:0.875rem;margin:0;">Illustrative data only.</p>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+class Component extends DCLogic {
+  componentDidMount() {
+    const tryInit = () => {
+      if (window.Chart && window.d3 && window.topojson && window.WORLD && window.initAIAdoptionDashboard) {
+        window.initAIAdoptionDashboard(this.rootEl);
+      } else {
+        setTimeout(tryInit, 60);
+      }
+    };
+    tryInit();
+  }
+  renderVals() {
+    return {
+      rootRef: (el) => { this.rootEl = el; },
+      navItems: [{ label: 'World map', href: 'index.html#world-map' }, { label: 'Comparisons', href: 'index.html#comparisons' }, { label: 'Country indicators', href: 'index.html#country-indicators' }, { label: 'Stakeholder questions', href: '#questions' }]
+    };
+  }
+}
+</script>
+
+
+</body></html>

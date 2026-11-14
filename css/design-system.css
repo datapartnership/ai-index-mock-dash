@@ -1,0 +1,237 @@
+/* Loop color palette. Names follow the source kit's HSL-lightness convention (blue-45 = #0071bc, L≈45). */
+:root{
+--blue-12:#002245;--blue-20:#013367;--blue-30:#004c92;--blue-38:#0c5e9e;--blue-45:#0071bc;--blue-47:#0079aa;--blue-61:#009fda;
+--gray-7:#161616;--gray-15:#262626;--gray-21:#333333;--gray-29:#444444;--gray-36:#545454;--gray-44:#717171;--gray-50:#787878;--gray-85:#d4d4d4;--gray-91:#e5e5e5;--gray-95:#f0f0f0;--gray-97:#f6f6f6;--white:#ffffff;
+--orange-46:#cd2c0f;--orange-57:#ec553a;--orange-64:#f07761;
+--teal-52:#028294;--teal-60:#058a8f;--teal-63:#02aac0;--teal-67:#02a1b6;
+--green-69:#4cbb88;
+--red-50:#e6201c;--red-87:#f8d1d1;--red-99:#fffdfd;
+--yellow-50:#a36902;--yellow-86:#f1cfb6;--yellow-99:#fffdf9;
+--green-49:#288462;--green-68:#60b797;--green-99:#f9fffa;
+--blue-46:#3b6cc2;--blue-88:#d5dde9;--blue-99:#fafcff;
+/* form tints (primary inputs / checkboxes / dropdowns) */
+--tint-blue-bg:#fafdff;--tint-blue-border:#d8e7f5;--tint-blue-inset:#f0f7fe;--tint-blue-menu:#b6d9fa;--tint-blue-highlight:#d9ecfd;--tint-blue-row:#f5f7fc;
+--focus-ring:#66afe9;
+
+/* semantic aliases */
+--brand-primary:var(--blue-45);--brand-primary-hover:var(--blue-30);--brand-navy:var(--blue-12);--brand-sky:var(--blue-61);
+--text-body:var(--gray-21);--text-muted:var(--gray-50);--text-lead:var(--gray-36);--text-inverse:var(--white);
+--link:var(--blue-45);--link-hover:var(--blue-30);
+--surface-page:var(--white);--surface-subtle:var(--gray-97);--surface-card:var(--white);--surface-dark:var(--gray-21);--surface-brand:var(--blue-45);--surface-hero:var(--blue-61);
+--border-default:var(--gray-91);--border-strong:var(--gray-85);--border-rule:var(--gray-50);
+--accent-card:var(--teal-60);--accent-synopsis:var(--teal-67);
+--cta-orange:var(--orange-57);--cta-orange-hover:var(--orange-46);
+--disabled-bg:var(--gray-85);
+--error-fg:var(--red-50);--error-border:var(--red-87);--error-bg:var(--red-99);
+--warning-fg:var(--yellow-50);--warning-border:var(--yellow-86);--warning-bg:var(--yellow-99);
+--success-fg:var(--green-49);--success-border:var(--green-68);--success-bg:var(--green-99);
+--info-fg:var(--blue-46);--info-border:var(--blue-88);--info-bg:var(--blue-99);
+}
+
+:root{
+--font-display:'Andes',sans-serif;--font-display-bold:'AndesBold','Andes',sans-serif;--font-body:'Open Sans',sans-serif;--font-icon:'loop_icon';
+/* headings — desktop (≥768px) values; mobile values in comments */
+--h1-size:2.5rem;--h1-lh:2.75rem;      /* mobile 2rem/2.375rem */
+--h2-size:2.25rem;--h2-lh:2.5rem;      /* mobile 2rem/2.375rem */
+--h3-size:2rem;--h3-lh:2.25rem;        /* mobile 1.75rem/2.125rem */
+--h4-size:1.75rem;--h4-lh:2rem;        /* mobile 1.5rem/1.875rem */
+--h5-size:1.5rem;--h5-lh:1.75rem;      /* mobile 1.25rem/1.625rem */
+--h6-size:1.25rem;--h6-lh:1.5rem;
+--section-heading-size:2.75rem;--section-heading-lh:3rem;
+--hero-heading-size:2.5rem;--hero-heading-lh:2.75rem;
+--stat-size:40px;--stat-lh:44px;
+/* body */
+--lead-lg-size:1.25rem;--lead-lg-lh:2rem;
+--body-md-size:1.125rem;--body-md-lh:1.8125rem;
+--lead-sm-size:1rem;--lead-sm-lh:1.75rem;
+--body-size:1rem;--body-lh:1.5rem;
+--blurb-size:0.875rem;--blurb-lh:1.375rem;
+--caption-size:0.8125rem;--caption-lh:1.0625rem;
+--hammer-size:0.75rem;--hammer-lh:1rem;
+--btn-letter-spacing:.78px;
+--weight-regular:400;--weight-semibold:600;--weight-bold:700;
+}
+
+:root{
+--space-4:4px;--space-8:8px;--space-12:12px;--space-16:16px;--space-24:24px;--space-32:32px;--space-64:64px;
+--gutter:15px;
+--container-sm:550px;--container-md:750px;--container-lg:970px;--container-xl:1170px;--banner-max:1440px;
+--bp-sm:576px;--bp-md:768px;--bp-lg:992px;--bp-xl:1200px;
+--control-height:45px;--nav-min-height:60px;
+/* shape: Loop is square — radius 0 everywhere, 100% only for avatars/radios */
+--radius-none:0;--radius-round:100%;
+/* elevation */
+--shadow-card:0px 2px 2px 1px #e5e5e5;
+--shadow-dropdown:0 6px 12px rgba(0,0,0,.175);
+--shadow-megamenu:0 4px 4px rgba(0,0,0,.4);
+--shadow-input:inset 0 1px 1px rgba(0,0,0,.075);
+--shadow-input-focus:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+--shadow-primary-inset:inset 0px 3px 0px 0px #f0f7fe;
+--shadow-primary-input:inset 0px 2px 1px 0px #f0f7fe;
+--shadow-secondary-input:inset 0px 1px 2px 0px #d4d4d4;
+--shadow-row:0px -1px 1px 0px #e5e5e5;
+/* overlays */
+--overlay-banner:rgba(0,0,0,.7);--overlay-ghost-hover:rgba(255,255,255,.2);--overlay-ghost-inverse:rgba(0,0,0,.1);--overlay-ghost-inverse-hover:rgba(0,0,0,.4);--overlay-cta-gradient:rgba(51,51,51,.8);
+--gradient-card-overlay:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.2) 20%,#000 100%); /* @kind color */
+--gradient-img:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(0,0,0,.7) 100%); /* @kind color */
+/* motion */
+--ease-std:ease; /* @kind other */
+--dur-fast:.15s; /* @kind other */
+--dur-std:.3s; /* @kind other */
+--dur-slow:.5s; /* @kind other */
+}
+
+/* loop_icon glyph font — 146 icons. Usage: <i class="loop loop-search"></i> */
+.loop{font-family:'loop_icon' !important;speak:none;font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.loop-angle-double-down:before{content:"\e701"}
+.loop-angle-double-left:before{content:"\e702"}
+.loop-angle-double-right:before{content:"\e703"}
+.loop-angle-double-up:before{content:"\e704"}
+.loop-angle-down:before{content:"\e705"}
+.loop-angle-left:before{content:"\e706"}
+.loop-angle-right:before{content:"\e707"}
+.loop-angle-up:before{content:"\e708"}
+.loop-bars:before{content:"\e709"}
+.loop-calendar:before{content:"\e70a"}
+.loop-check:before{content:"\e711"}
+.loop-chevron-down:before{content:"\e712"}
+.loop-chevron-left:before{content:"\e713"}
+.loop-chevron-right:before{content:"\e714"}
+.loop-chevron-up:before{content:"\e715"}
+.loop-circle-o:before{content:"\e716"}
+.loop-circle:before{content:"\e717"}
+.loop-close:before{content:"\e718"}
+.loop-comment:before{content:"\e719"}
+.loop-comments-o:before{content:"\e720"}
+.loop-download:before{content:"\e721"}
+.loop-forward:before{content:"\e722"}
+.loop-minus:before{content:"\e723"}
+.loop-print:before{content:"\e724"}
+.loop-quote-left:before{content:"\e725"}
+.loop-quote-right:before{content:"\e726"}
+.loop-reply:before{content:"\e727"}
+.loop-search-minus:before{content:"\e728"}
+.loop-search-plus:before{content:"\e729"}
+.loop-search:before{content:"\e730"}
+.loop-share:before{content:"\e731"}
+.loop-camera:before{content:"\e732"}
+.loop-microphone:before{content:"\e733"}
+.loop-play:before{content:"\e734"}
+.loop-soundcloud:before{content:"\e735"}
+.loop-apps:before{content:"\e736"}
+.loop-blogs:before{content:"\e737"}
+.loop-delicious:before{content:"\e738"}
+.loop-digg:before{content:"\e739"}
+.loop-envelope:before{content:"\e740"}
+.loop-facebook:before{content:"\e741"}
+.loop-flickr:before{content:"\e742"}
+.loop-google:before{content:"\e743"}
+.loop-huffingtonpost:before{content:"\e744"}
+.loop-instagram:before{content:"\e745"}
+.loop-linkedin:before{content:"\e746"}
+.loop-prezi:before{content:"\e747"}
+.loop-qq:before{content:"\e748"}
+.loop-renren:before{content:"\e749"}
+.loop-rss:before{content:"\e750"}
+.loop-scribd:before{content:"\e751"}
+.loop-slideshare:before{content:"\e752"}
+.loop-stumbleupon:before{content:"\e753"}
+.loop-tumblr:before{content:"\e754"}
+.loop-twitter:before{content:"\e755"}
+.loop-vk:before{content:"\e756"}
+.loop-weibo:before{content:"\e757"}
+.loop-whatsapp:before{content:"\e758"}
+.loop-youtube:before{content:"\e759"}
+.loop-agriculture-1:before{content:"\e760"}
+.loop-agriculture-2:before{content:"\e761"}
+.loop-aids:before{content:"\e762"}
+.loop-air-pollution:before{content:"\e763"}
+.loop-baby:before{content:"\e764"}
+.loop-biodiversity:before{content:"\e765"}
+.loop-clean-water-1:before{content:"\e766"}
+.loop-clean-water-2:before{content:"\e767"}
+.loop-clean-water-3:before{content:"\e768"}
+.loop-climate:before{content:"\e769"}
+.loop-disability:before{content:"\e770"}
+.loop-disease:before{content:"\e771"}
+.loop-education:before{content:"\e772"}
+.loop-education-1:before{content:"\e773"}
+.loop-electricity-1:before{content:"\e774"}
+.loop-electricity-2:before{content:"\e775"}
+.loop-energy:before{content:"\e776"}
+.loop-energy-1:before{content:"\e777"}
+.loop-environment:before{content:"\e778"}
+.loop-extractive-industries:before{content:"\e779"}
+.loop-financial-1:before{content:"\e780"}
+.loop-financial-2:before{content:"\e781"}
+.loop-financial-3:before{content:"\e782"}
+.loop-financial-4:before{content:"\e783"}
+.loop-financial-5:before{content:"\e784"}
+.loop-fire:before{content:"\e785"}
+.loop-flooding:before{content:"\e786"}
+.loop-gender-to-equality:before{content:"\e787"}
+.loop-gender:before{content:"\e788"}
+.loop-government:before{content:"\e789"}
+.loop-graduation-2:before{content:"\e790"}
+.loop-graph:before{content:"\e791"}
+.loop-graph-2:before{content:"\e792"}
+.loop-green-infrastruture:before{content:"\e793"}
+.loop-health:before{content:"\e794"}
+.loop-health-2:before{content:"\e795"}
+.loop-hydropower:before{content:"\e796"}
+.loop-infrastructure:before{content:"\e797"}
+.loop-irrigation:before{content:"\e798"}
+.loop-leave:before{content:"\e799"}
+.loop-maternal-health:before{content:"\e800"}
+.loop-micellaneous-1:before{content:"\e801"}
+.loop-micellaneous-2:before{content:"\e802"}
+.loop-micellaneous-3:before{content:"\e803"}
+.loop-micellaneous-4:before{content:"\e804"}
+.loop-micellaneous-5:before{content:"\e805"}
+.loop-micellaneous-6:before{content:"\e806"}
+.loop-micellaneous-7:before{content:"\e807"}
+.loop-micellaneous-8:before{content:"\e808"}
+.loop-micellaneous-9:before{content:"\e809"}
+.loop-micellaneous-10:before{content:"\e810"}
+.loop-micellaneous-11:before{content:"\e811"}
+.loop-money:before{content:"\e812"}
+.loop-mosquito:before{content:"\e813"}
+.loop-nutrition:before{content:"\e814"}
+.loop-pandemics:before{content:"\e815"}
+.loop-partnership:before{content:"\e816"}
+.loop-people:before{content:"\e817"}
+.loop-phone:before{content:"\e818"}
+.loop-plant:before{content:"\e819"}
+.loop-post-conflict-1:before{content:"\e820"}
+.loop-post-conflict-2:before{content:"\e821"}
+.loop-protection:before{content:"\e822"}
+.loop-recycle:before{content:"\e823"}
+.loop-regional:before{content:"\e824"}
+.loop-road:before{content:"\e825"}
+.loop-rural:before{content:"\e826"}
+.loop-sanitation:before{content:"\e827"}
+.loop-temperature-high:before{content:"\e828"}
+.loop-temperature-low:before{content:"\e829"}
+.loop-tools-1:before{content:"\e830"}
+.loop-tools-2:before{content:"\e831"}
+.loop-trade:before{content:"\e832"}
+.loop-transport:before{content:"\e833"}
+.loop-women:before{content:"\e834"}
+.loop-world:before{content:"\e835"}
+.loop-files:before{content:"\e836"}
+.loop-file-excel:before{content:"\e837"}
+.loop-file-text:before{content:"\e838"}
+.loop-file-word:before{content:"\e839"}
+.loop-file-pdf:before{content:"\e840"}
+.loop-file-powerpoint:before{content:"\e841"}
+.loop-file-image:before{content:"\e842"}
+.loop-file-movie:before{content:"\e843"}
+.loop-file-sound:before{content:"\e844"}
+.loop-file-archive:before{content:"\e845"}
+.loop-file-code:before{content:"\e846"}
+
+html{font-family:var(--font-body);-webkit-text-size-adjust:100%}
+body{font-family:var(--font-body);font-size:1rem;line-height:1.5rem;color:var(--text-body);background:var(--surface-page);margin:0}
+*,*:before,*:after{box-sizing:border-box}
+a{color:var(--link);text-decoration:none}
+a:hover,a:focus{color:var(--link-hover)}
