@@ -1,4 +1,36 @@
+Scope of this licence
+=====================
+
+The MIT License below applies only to the original work of the Development
+Data Partnership in this repository:
+
+  - index.html and questions.html
+  - js/dashboard-engine.js
+  - css/dashboard.css and css/questions.css
+
+It does not apply to the following files, which remain under their own terms:
+
+  - js/vendor/          Third-party libraries under their own licences:
+                        React and React DOM (MIT), D3 (ISC),
+                        topojson-client (ISC), Chart.js (MIT).
+  - fonts/andes*        Andes and Andes Bold are commercial typefaces licensed
+                        to the World Bank Group. Not for redistribution.
+  - fonts/open-sans*    Open Sans, SIL Open Font License 1.1.
+  - fonts/loop-icon*,
+    css/fonts.css,
+    css/design-system.css,
+    js/design-system.js,
+    js/dc-runtime.js    World Bank Group "Loop" design system and related
+                        brand assets. All rights reserved by the World Bank
+                        Group.
+  - data/world-topology.js
+                        Country boundaries of unconfirmed origin, used as
+                        placeholders. Not covered by this licence; replace
+                        with officially cleared boundaries before publishing.
+
+
 MIT License
+===========
 
 Copyright (c) 2026 Development Data Partnership
 

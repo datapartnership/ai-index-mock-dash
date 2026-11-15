@@ -34,7 +34,6 @@
   <header id="top" style="background:var(--gray-97);border-bottom:1px solid var(--gray-91);">
     <div style="max-width:1280px;margin:0 auto;padding:2.5rem 2rem 2.25rem;display:grid;grid-template-columns:1fr;">
       <div>
-        <div style="font-family:var(--font-body);font-size:0.8125rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-36);margin-bottom:0.75rem;">Data Dashboard | Quarterly</div>
         <h1 style="font-family:var(--font-display);font-size:3rem;line-height:3.25rem;font-weight:400;color:var(--blue-12);margin:0 0 1rem;">Global AI Adoption Index</h1>
         <p style="font-family:var(--font-body);font-size:1.125rem;line-height:1.8125rem;color:var(--gray-21);max-width:640px;margin:0;">A quarterly benchmark of where and how AI is used globally, drawn from consumer usage, API activity, and labor-market data across more than 190 economies.</p>
       </div>
@@ -177,7 +176,7 @@
               <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:flex-start;">
                 <div>
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Work activities</h3>
-                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of work-related conversations by O*NET work activity. Each general work activity (GWA) contains several intermediate work activities (IWAs).</p>
+                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of all sampled conversations (work, personal and education) by O*NET work activity, this quarter. Each general work activity (GWA) contains intermediate work activities (IWAs); those shown can be reported for every country each quarter.</p>
                 </div>
                 <button type="button" id="wa-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
@@ -197,8 +196,8 @@
                 <div id="c-wause" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Use type split for each work activity: work, personal and education, as shares of that activity's conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div role="tabpanel" id="tabpanel-wa-top" aria-labelledby="tab-wa-top" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.5rem;">The ten largest intermediate work activities (IWAs) across all work activities, share of work-related conversations (%).</p>
-                <div id="c-iwa" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Top 10 intermediate work activities by share of work-related conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.5rem;">The ten largest intermediate work activities (IWAs) across all work activities, share of all sampled conversations (%). Shares of work-related conversations only are published half-yearly.</p>
+                <div id="c-iwa" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Top 10 intermediate work activities by share of all sampled conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div id="wa-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
               <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data</p>
@@ -223,7 +222,7 @@
                 <div id="occ-prof"></div>
               </div>
               <div role="tabpanel" id="tabpanel-occ-acts" aria-labelledby="tab-occ-acts" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Choose an occupational topic to see which intermediate work activities (IWAs) its conversations are about. Each bar is that activity's share of the occupation's conversations. The black marker is its share across all occupations together, so a bar that runs past the marker is something this occupation does more than most.</p>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Choose an occupational topic to see which intermediate work activities (IWAs) its conversations are about. Activities within an occupation are smaller cells, so they are published annually by country (four quarters pooled) and quarterly by region. Each bar is that activity's share of the occupation's conversations. The black marker is its share across all occupations together, so a bar that runs past the marker is something this occupation does more than most.</p>
                 <div style="display:flex;flex-direction:column;gap:0.35rem;min-width:18rem;max-width:26rem;margin-bottom:1rem;"><label for="sel-occ-topic" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">OCCUPATIONAL TOPIC</label><select id="sel-occ-topic" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"></select></div>
                 <div id="occ-acts" aria-live="polite"></div>
               </div>
