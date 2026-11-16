@@ -1375,7 +1375,7 @@ function qxTiles(ts, hd) {
 }
 function qxBody(i) {
   const q = QX[i], b = q.build(), w = q.worked ? QX_W3 : null;
-  const asked = Object.keys(q.asked).map(k => `<span><b>${k}</b> ${esc(q.asked[k])}</span>`).join('');
+  const asked = Object.keys(q.asked).map(k => `<span><b>${esc(k)}</b></span>`).join('');
   const li = (sq, t, d) => `<li class="qx-li">${sq}<span><span class="qx-lt">${esc(t)}</span>${d ? `<span class="qx-ld">${esc(d)}</span>` : ''}</span></li>`;
   const idx = q.index.map(x => li(qxSq(x.k, 14), x.t, x.d)).join('');
   const sup = w ? w.cards.map(d => `<li class="qx-dc"><div class="qx-dch">${qxSq('s', 14)}<b>${esc(d.n)}</b><span class="qx-tag">${esc(d.tag)}</span></div><p>${esc(d.m)}</p>${d.w ? `<p class="qx-wo"><b>Note:</b> ${esc(d.w)}</p>` : ''}<div class="qx-lk">${qxLinks(d.links)}</div></li>`).join('')
