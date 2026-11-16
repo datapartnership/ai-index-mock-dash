@@ -672,7 +672,7 @@ function renderCountry(root) {
   const qcard = kind => {
     const me = chg(kind, code), wd = chg(kind, 'World');
     return [IND[kind], me.v == null ? 'n/a' : signed(me.v),
-      me.v == null ? `First quarter in the series. Index ${me.lvl}` : `Quarterly change. Index ${me.lvl}; world ${signed(wd.v)}`, MCOL[kind]];
+      me.v == null ? `First quarter in the series. Growth Index ${me.lvl}` : `Growth Index. Index ${me.lvl}; world ${signed(wd.v)}`, MCOL[kind]];
   };
   const cards = [
     qcard('consumer'),
