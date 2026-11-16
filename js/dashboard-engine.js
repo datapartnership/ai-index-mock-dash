@@ -181,15 +181,6 @@ const FIXED = { 'Brazil': 0.56, 'Malawi': 0.14, 'United States of America': 0.92
 const IND = { consumer: 'Consumer activity diffusion', api: 'API usage volume' };
 const NORM = { pop: 'per person', wap: 'per working-age person', gdp: 'per unit of GDP', gdppc: 'relative to GDP per capita' };
 const KSLOPE = { pop: 3.0, wap: 2.9, gdp: 1.0, gdppc: 0.6 };
-const COR = [
-  { id: 'internet', label: 'Population with access to the Internet', unit: '%', lo: 8, hi: 99, a: 0.85, sign: 1 },
-  { id: 'urban', label: 'Urban population', unit: '%', lo: 15, hi: 95, a: 0.6, sign: 1 },
-  { id: 'lrl', label: 'Low-resource language index', unit: '', lo: 0, hi: 1, a: 0.7, sign: -1 },
-  { id: 'phones', label: 'Population with smartphones', unit: '%', lo: 10, hi: 95, a: 0.8, sign: 1 },
-  { id: 'elec', label: 'Electrification rate', unit: '%', lo: 12, hi: 100, a: 0.75, sign: 1 },
-  { id: 'college', label: 'College graduates (adults)', unit: '%', lo: 1, hi: 50, a: 0.7, sign: 1 }
-];
-
 const GWA = ['Getting information','Working with computers','Thinking creatively','Analyzing data or information','Documenting and recording information','Communicating with people outside the organization','Training and teaching others','Making decisions and solving problems','Interpreting the meaning of information for others','Providing consultation and advice to others'];
 const GWA_W = [13, 9, 12, 6, 12, 2, 3, 7, 3, 24];   // roughly Claude.ai shares (Anthropic Economic Index)
 const IWA = ['Write material for artistic or commercial purposes','Program computer systems or production equipment','Interpret language, cultural, or religious information for others','Prepare informational or instructional materials','Analyze data to improve operations','Edit written materials or documents','Explain technical details of products or services','Explain regulations, policies, or procedures','Develop marketing or promotional materials','Advise others on healthcare or wellness issues'];
@@ -349,149 +340,29 @@ function indValue(n, ind, norm) {
   const k = KSLOPE[norm] * (ind === 'api' ? 1.25 : 1);
   return Math.max(1, Math.round(100 * Math.exp(k * (score(n) - 0.5)) * (0.8 + 0.4 * h(n + ind + norm))));
 }
-function corValue(n, c) {
-  let t = c.a * (score(n) - 0.05) / 0.9 + (1 - c.a) * h(n + c.id);
-  t = Math.min(1, Math.max(0, t));
-  if (c.sign < 0) t = 1 - t;
-  const v = c.lo + (c.hi - c.lo) * t;
-  return c.unit === '%' ? Math.round(v) : Math.round(v * 100) / 100;
-}
-
-const labelPlugin = {
-  id: 'pointLabels',
-  afterDatasetsDraw(chart) {
-    const meta = chart.getDatasetMeta(1); if (!meta || meta.hidden) return;
-    const ctx = chart.ctx; ctx.save(); ctx.font = "500 11px 'Open Sans', sans-serif"; ctx.fillStyle = INK;
-    meta.data.forEach((pt, i) => {
-      const name = chart.data.datasets[1].data[i].short;
-      const right = pt.x > chart.chartArea.right - 70;
-      ctx.textAlign = right ? 'right' : 'left';
-      ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.strokeText(name, pt.x + (right ? -11 : 11), pt.y + 4); ctx.fillText(name, pt.x + (right ? -11 : 11), pt.y + 4);
-    });
-    ctx.restore();
-  }
-};
-
-// Least-squares fit of ln(y) on x (or on ln(x) when the x axis is logarithmic).
-// R² and r are therefore on the log of the indicator, which is how the axes are drawn.
-function fitLog(pts, logX) {
-  const xs = pts.map(p => logX ? Math.log(p.x) : p.x), ys = pts.map(p => Math.log(p.y));
-  const mx = d3.mean(xs), my = d3.mean(ys);
-  const sxx = d3.sum(xs, v => (v - mx) ** 2), syy = d3.sum(ys, v => (v - my) ** 2), sxy = d3.sum(xs, (v, i) => (v - mx) * (ys[i] - my));
-  const b = sxy / sxx, a = my - b * mx, r = sxy / Math.sqrt(sxx * syy);
-  const x0 = d3.min(pts, p => p.x), x1 = d3.max(pts, p => p.x);
-  const f = x => Math.exp(a + b * (logX ? Math.log(x) : x));
-  return { r, r2: r * r, n: pts.length, line: [{ x: x0, y: f(x0) }, { x: x1, y: f(x1) }] };
-}
-const fmt2 = v => (Math.round(v * 100) / 100).toFixed(2).replace('-', '\u2212');
-
-// "R² = 0.62" printed inside the plot area; the text comes from options.plugins.r2Label
-const r2Plugin = {
-  id: 'r2Label',
-  afterDatasetsDraw(chart) {
-    const o = chart.options.plugins && chart.options.plugins.r2Label; if (!o || !o.text) return;
-    const ctx = chart.ctx, a = chart.chartArea;
-    ctx.save(); ctx.font = "700 13px 'Open Sans', sans-serif";
-    const w = ctx.measureText(o.text).width + 16, hgt = 24;
-    const x = o.corner === 'tr' ? a.right - w - 8 : a.left + 8, y = a.top + 8;
-    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fillRect(x, y, w, hgt);
-    ctx.strokeStyle = o.color || INK; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, w - 1, hgt - 1);
-    ctx.fillStyle = INK; ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillText(o.text, x + 8, y + hgt / 2 + 0.5);
-    ctx.restore();
-  }
-};
-const logTicks = v => { const m = v / Math.pow(10, Math.floor(Math.log10(v))); return (Math.abs(m - 1) < 1e-9 || Math.abs(m - 3) < 1e-9) ? v : ''; };
-
-// Correlation scatter with a fitted trend line and R². o: { pts, fit, dotColors, dotBorder, xTitle, yTitle, xColor, yColor,
-// xLog, xUnit, tip, heads }. Mock-profile countries are drawn as labelled dark diamonds, as on the map.
-function corrScatter(id, o) {
-  const prof = o.pts.filter(p => PROFILE[p.name]).map(p => Object.assign({ short: p.name === 'United States of America' ? 'United States' : p.name }, p));
-  const rest = o.pts.filter(p => !PROFILE[p.name]);
-  draw(id, {
-    type: 'scatter',
-    tableHeads: o.heads,
-    data: { datasets: [
-      { label: 'Countries', data: rest, order: 1, backgroundColor: rest.map(p => o.dotColors(p)), borderColor: o.dotBorder, borderWidth: 1, pointRadius: 4.5, pointHoverRadius: 6.5 },
-      { label: 'Mock profiles', data: prof, order: 0, backgroundColor: HILITE, borderColor: '#fff', borderWidth: 2, pointRadius: 7, pointHoverRadius: 9, pointStyle: 'rectRot' },
-      { type: 'line', label: 'Trend line', data: o.fit.line, order: 2, borderColor: INK, borderWidth: 2, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 0, fill: false, tension: 0 }
-    ] },
-    options: {
-      plugins: {
-        legend: { display: false },
-        tooltip: { filter: it => it.dataset.type !== 'line', callbacks: { label: o.tip } },
-        r2Label: { text: `R² = ${fmt2(o.fit.r2)}`, corner: o.fit.r < 0 ? 'tr' : 'tl', color: o.yColor }
-      },
-      scales: {
-        x: Object.assign({ title: { display: true, text: o.xTitle, color: o.xColor, font: { size: 12, weight: '600' } } }, o.xLog ? { type: 'logarithmic', ticks: { callback: logTicks, autoSkip: false, maxRotation: 0 } } : {}),
-        y: { type: 'logarithmic', ticks: { callback: logTicks }, title: { display: true, text: o.yTitle, color: o.yColor, font: { size: 12, weight: '600' } } }
-      }
-    },
-    plugins: [labelPlugin, r2Plugin]
-  });
-}
-
-// Both core indicators for every country, under the chosen normalization
 function metricValues(norm) {
   const v = { consumer: {}, api: {} };
   countries.forEach(n => { v.consumer[n] = indValue(n, 'consumer', norm); v.api[n] = indValue(n, 'api', norm); });
   return v;
 }
-const darker = c => c + 'AA';   // ramp's darkest step, semi-opaque, as a dot outline
+function indicatorDeciles(values) {
+  const scale = d3.scaleQuantile().domain(Object.values(values)).range(d3.range(1, 11));
+  return Object.fromEntries(Object.entries(values).map(([country, value]) => [country, scale(value)]));
+}
 
 function renderMap(root) {
   const ind = root.querySelector('#sel-ind').value, norm = root.querySelector('#sel-norm').value;
   const both = metricValues(norm), values = both[ind], ramp = RAMPS[ind];
-  mapState = { ind, norm, values, vc: both.consumer, va: both.api };
-  const scale = d3.scaleQuantile(Object.values(values), ramp);
-  paths.attr('fill', d => values[d.properties.name] == null ? NODATA : scale(values[d.properties.name]));
+  const deciles = { consumer: indicatorDeciles(both.consumer), api: indicatorDeciles(both.api) };
+  mapState = { ind, norm, deciles };
+  const colors = d3.range(10).map(i => d3.interpolateRgb(ramp[0], ramp[ramp.length - 1])(i / 9));
+  const scale = d3.scaleOrdinal().domain(d3.range(1, 11)).range(colors);
+  paths.attr('fill', d => deciles[ind][d.properties.name] == null ? NODATA : scale(deciles[ind][d.properties.name]));
   root.querySelector('#map-title').textContent = ind === 'consumer' ? `${IND[ind]} (based on Monthly Active Users) ${NORM[norm]}` : `${IND[ind]} ${NORM[norm]}`;
-  const q = scale.quantiles().map(Math.round), b = [null].concat(q);
   const chip = c => `<span style="display:inline-block;width:1rem;height:1rem;border-radius:0;margin-right:0.25rem;vertical-align:-2px;border:1px solid rgba(0,0,0,.15);background:${c}"></span>`;
-  root.querySelector('#map-legend').innerHTML = ramp.map((c, i) =>
-    `<span>${chip(c)}${i === 0 ? 'under ' + q[0] : i === ramp.length - 1 ? q[i - 1] + ' and over' : b[i] + ' to ' + (q[i] - 1)}</span>`).join('') +
+  root.querySelector('#map-legend').innerHTML = colors.map((c, i) =>
+    `<span>${chip(c)}Decile ${i + 1}${i === 0 ? ' (lowest)' : i === 9 ? ' (highest)' : ''}</span>`).join('') +
     `<span>${chip(NODATA)}No data</span>`;
-
-  // Side scatter: API usage volume against Consumer activity diffusion. Dots take the colour the country has on the map.
-  const pts = countries.map(n => ({ x: both.consumer[n], y: both.api[n], name: n }));
-  const fit = fitLog(pts, true);
-  setHead('c-scatter', `${IND.api} and ${IND.consumer.toLowerCase()}`,
-    `Each dot is a country, coloured as on the map. Log-log fit: R² = ${fmt2(fit.r2)}, r = ${fmt2(fit.r)}, n = ${pts.length}.`);
-  const scEl = document.getElementById('c-scatter');
-  scEl.querySelector('h3').style.fontSize = '1rem';
-  scEl.querySelector('h3').style.lineHeight = '1.3';
-  scEl.querySelector('.card-sub').style.fontSize = '0.8125rem';
-  corrScatter('c-scatter', {
-    pts, fit, xLog: true,
-    dotColors: p => scale(values[p.name]), dotBorder: darker(ramp[4]),
-    xTitle: `${IND.consumer} (world median = 100)`, yTitle: `${IND.api} (world median = 100)`,
-    xColor: MCOL.consumer, yColor: MCOL.api,
-    heads: { x: IND.consumer, y: IND.api },
-    tip: c => ` ${c.raw.name}: consumer ${c.raw.x}, API ${c.raw.y}`
-  });
-}
-
-// Comparisons: each core indicator against the chosen comparator, as two correlation scatters
-let cmpState = {};
-function renderComparisons(root) {
-  const norm = root.querySelector('#sel-norm-cmp').value, cor = COR.find(c => c.id === root.querySelector('#sel-cor').value);
-  const both = metricValues(norm);
-  cmpState = { norm, cor, vc: both.consumer, va: both.api, fits: {} };
-  const xTitle = cor.label + (cor.unit ? ' (' + cor.unit + ')' : '');
-  ['consumer', 'api'].forEach(k => {
-    const pts = countries.map(n => ({ x: corValue(n, cor), y: both[k][n], name: n }));
-    const fit = fitLog(pts, false);
-    cmpState.fits[k] = fit;
-    setHead('c-cmp-' + k, `${IND[k]} and ${cor.label.toLowerCase()}`,
-      `Each dot is a country. Log-linear fit: R² = ${fmt2(fit.r2)}, r = ${fmt2(fit.r)}, n = ${pts.length}. ${IND[k]} ${NORM[norm]}, world median = 100.`);
-    corrScatter('c-cmp-' + k, {
-      pts, fit, xLog: false,
-      dotColors: () => MCOL[k] + 'B3', dotBorder: '#fff',
-      xTitle, yTitle: `${IND[k]} (world median = 100)`,
-      xColor: INK, yColor: MCOL[k],
-      heads: { x: cor.label, y: IND[k] },
-      tip: c => ` ${c.raw.name}: ${c.raw.x}${cor.unit}, ${c.raw.y}`
-    });
-  });
 }
 
 function renderBenchmark(root, code, c, q) {
@@ -956,29 +827,18 @@ function initModal(root) {
   });
 
   function openAccess(kind) {
-    const { ind, norm, values, vc, va } = mapState, c = C[root.querySelector('#sel-country').value], q = QUARTERS[+root.querySelector('#sel-q').value];
+    const { ind, norm, deciles } = mapState, c = C[root.querySelector('#sel-country').value], q = QUARTERS[+root.querySelector('#sel-q').value];
     copyText = ''; copyStatus.textContent = '';
     if (dlBtn) dlBtn.style.display = 'none';
     if (kind === 'csv') {
-      const text = 'country,normalization,consumer_activity_diffusion,api_usage_volume\n' + countries.slice().sort().map(n => `${csvCell(n)},${norm},${vc[n]},${va[n]}`).join('\n');
-      presentFile('Download .csv', `<p>Data behind the world map: <strong>${esc(IND.consumer)}</strong> and <strong>${esc(IND.api)}</strong> ${esc(NORM[norm])} for ${countries.length} countries, world median = 100. Check the contents below, then download or copy the file.</p>`,
+      const text = 'country,normalization,consumer_activity_decile,api_usage_decile\n' + countries.slice().sort().map(n => `${csvCell(n)},${norm},${deciles.consumer[n]},${deciles.api[n]}`).join('\n');
+      presentFile('Download .csv', `<p>Data behind the world map: <strong>${esc(IND.consumer)}</strong> and <strong>${esc(IND.api)}</strong> deciles, ${esc(NORM[norm])}, for ${countries.length} countries. Decile 1 is the lowest group and decile 10 the highest. Check the contents below, then download or copy the file.</p>`,
         text, `ai-adoption-index_world-map_${norm}.csv`);
       return;
     } else if (kind === 'api') {
       copyText = `curl "https://api.ai-adoption-index.example/v1/indicators?indicator=${ind}&normalize=${norm}&period=2026Q3&format=json"`;
       aTitle.textContent = 'Access via API';
-      aBody.innerHTML = `<p>Placeholder endpoint for the current map selection. The address is not real.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre><p style="margin-bottom:0.25rem;">Example response:</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(JSON.stringify({ indicator: ind, normalize: norm, period: '2026Q3', unit: 'world median = 100', data: [{ country: 'BRA', value: values['Brazil'] }, { country: 'MWI', value: values['Malawi'] }, { country: 'USA', value: values['United States of America'] }] }, null, 2))}</pre>`;
-    } else if (kind === 'cmpcsv') {
-      const { cor: kc, norm: kn, vc: cc, va: ca, fits } = cmpState;
-      const text = `country,normalization,consumer_activity_diffusion,api_usage_volume,${kc.id}\n` + countries.slice().sort().map(n => `${csvCell(n)},${kn},${cc[n]},${ca[n]},${corValue(n, kc)}`).join('\n');
-      presentFile('Download .csv', `<p>Data behind the comparison with <strong>${esc(kc.label)}</strong>: ${countries.length} countries. Fitted R² is ${fmt2(fits.consumer.r2)} for ${esc(IND.consumer)} and ${fmt2(fits.api.r2)} for ${esc(IND.api)}. Check the contents below, then download or copy the file.</p>`,
-        text, `ai-adoption-index_comparison_${kc.id}_${kn}.csv`);
-      return;
-    } else if (kind === 'cmpapi') {
-      const { cor: kc, norm: kn } = cmpState;
-      copyText = `curl "https://api.ai-adoption-index.example/v1/comparisons?compare=${kc.id}&normalize=${kn}&period=2026Q3&format=json"`;
-      aTitle.textContent = 'Access via API';
-      aBody.innerHTML = `<p>Placeholder endpoint for the current comparison. The address is not real.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre>`;
+      aBody.innerHTML = `<p>Placeholder endpoint for the current map selection. The address is not real. Values are deciles (1 = lowest group, 10 = highest group), not exact ranks.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre><p style="margin-bottom:0.25rem;">Example response:</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(JSON.stringify({ indicator: ind, normalize: norm, period: '2026Q3', unit: 'decile (1 = lowest, 10 = highest)', data: [{ country: 'BRA', value: deciles[ind]['Brazil'] }, { country: 'MWI', value: deciles[ind]['Malawi'] }, { country: 'USA', value: deciles[ind]['United States of America'] }] }, null, 2))}</pre>`;
     } else if (kind === 'mcp') {
       copyText = JSON.stringify({ mcpServers: { 'ai-adoption-index': { type: 'http', url: 'https://mcp.ai-adoption-index.example/mcp' } } }, null, 2);
       aTitle.textContent = 'Access via MCP (proposed)';
@@ -1617,12 +1477,9 @@ function chartDefaults() {
 
 function init(root) {
   if (root.querySelector('#qx-root')) { chartDefaults(); initQx(root); return; }   // the reimagined Questions page
-  const selInd = root.querySelector('#sel-ind'), selNorm = root.querySelector('#sel-norm'), selCor = root.querySelector('#sel-cor'), selNormCmp = root.querySelector('#sel-norm-cmp');
+  const selInd = root.querySelector('#sel-ind'), selNorm = root.querySelector('#sel-norm');
   const MAIN = !!root.querySelector('#world-map');   // the Questions page has no map, comparisons or country sections
   if (MAIN) {
-  selCor.innerHTML = COR.map(c => `<option value="${c.id}">${esc(c.label)}</option>`).join('');
-  selNormCmp.innerHTML = selNorm.innerHTML;
-
   features = topojson.feature(WORLD, WORLD.objects.countries).features.filter(f => !SKIP.includes(f.properties.name));
   countries = features.map(f => f.properties.name).filter(n => !NO_DATA.includes(n));
 
@@ -1636,9 +1493,9 @@ function init(root) {
   const profFeats = features.filter(f => PROFILE[f.properties.name]);
   [['#fff', 4], [HILITE, 1.75]].forEach(([col, w]) => svg.append('g').attr('pointer-events', 'none').selectAll('path').data(profFeats).join('path').attr('d', path).attr('fill', 'none').attr('stroke', col).attr('stroke-width', w).attr('stroke-linejoin', 'round'));
   paths.on('mousemove', (ev, d) => {
-    const n = d.properties.name, v = mapState.values && mapState.values[n];
-    tip.innerHTML = `<strong>${esc(n)}</strong><br>` + (v == null ? 'No data' :
-      `${IND.consumer}: ${mapState.vc[n]}<br>${IND.api}: ${mapState.va[n]}` +
+    const n = d.properties.name, decile = mapState.deciles && mapState.deciles[mapState.ind][n];
+    tip.innerHTML = `<strong>${esc(n)}</strong><br>` + (decile == null ? 'No data' :
+      `${esc(IND[mapState.ind])}: decile ${decile}` +
       (PROFILE[n] ? '<br><em>Click to open the country profile</em>' : ''));
     const r = mapEl.getBoundingClientRect();
     tip.style.display = 'block';
@@ -1662,11 +1519,9 @@ function init(root) {
   selQ.innerHTML = QUARTERS.map((q, i) => `<option value="${i}">${q}</option>`).join('');
   selQ.value = QUARTERS.length - 1;
 
-  // normalization is shared by the map and the Comparisons section: the two selectors stay in step
   if (MAIN) {
   selInd.addEventListener('change', () => renderMap(root));
-  selCor.addEventListener('change', () => renderComparisons(root));
-  [[selNorm, selNormCmp], [selNormCmp, selNorm]].forEach(([from, to]) => from.addEventListener('change', () => { to.value = from.value; renderMap(root); renderComparisons(root); }));
+  selNorm.addEventListener('change', () => renderMap(root));
   }
   [selCountry, selQ].forEach(s => s.addEventListener('change', () => renderCountry(root)));
   // the Jobs and skills question carries its own country and quarter selectors, kept in step with these
@@ -1704,7 +1559,7 @@ function init(root) {
   initTabs(root);
   initQuestionFrames(root);
 
-  if (MAIN) { renderMap(root); renderComparisons(root); }
+  if (MAIN) renderMap(root);
   renderCountry(root);
 }
 
