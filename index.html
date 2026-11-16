@@ -153,13 +153,13 @@
         <div role="tabpanel" id="tabpanel-consumer" aria-labelledby="tab-consumer" data-tab-panel="consumer" style="display:block;">
           <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">Consumer AI use is estimated from sampled conversations, including small firms using consumer plans. Illustrative data.</p>
           <div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:1.25rem;">
-            <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-usetype" data-cc="1" data-title="Use type" data-sub="Share of sampled conversations (%)" data-h="140"></div></div>
-            <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-lang" data-cc="1" data-title="Top languages for queries" data-sub="Share of sampled conversations (%)" data-h="140"></div></div>
+            <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-usetype" data-cc="1" data-title="Use type" data-sub="Share of consumer AI activity (%)" data-h="140"></div></div>
+            <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-lang" data-cc="1" data-title="Top languages for queries" data-sub="Share of consumer AI activity (%)" data-h="140"></div></div>
                         <div id="wa-card" style="grid-column:1/-1;background:#fff;border:1px solid var(--gray-91);border-top:1px solid var(--teal-60);padding:1.25rem 1.5rem;box-shadow:var(--shadow-card);">
               <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:flex-start;">
                 <div>
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Work activities</h3>
-                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of all sampled conversations (work, personal and education) by O*NET work activity, this quarter. Each general work activity (GWA) contains intermediate work activities (IWAs); those shown can be reported for every country each quarter.</p>
+                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of consumer AI activity (work, personal and education) by O*NET work activity, this quarter. Each general work activity (GWA) contains intermediate work activities (IWAs); those shown can be reported for every country each quarter.</p>
                 </div>
                 <button type="button" id="wa-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
@@ -174,13 +174,13 @@
                 <div id="wa-detail" aria-live="polite" style="margin-top:1.5rem;"></div>
               </div>
               <div role="tabpanel" id="tabpanel-wa-use" aria-labelledby="tab-wa-use" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.75rem;max-width:760px;">For each work activity, how its conversations split between work, personal and education use. Each bar adds to 100%. Activities are listed largest first.</p>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.75rem;max-width:760px;">For each work activity, how consumer AI activity splits between work, personal and education use. Each bar adds to 100%. Activities are listed largest first.</p>
                 <div id="wa-use-msg" style="display:none;"></div>
-                <div id="c-wause" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Use type split for each work activity: work, personal and education, as shares of that activity's conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <div id="c-wause" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Use type split for each work activity: work, personal and education, as shares of consumer AI activity. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div role="tabpanel" id="tabpanel-wa-top" aria-labelledby="tab-wa-top" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.5rem;">The ten largest intermediate work activities (IWAs) across all work activities, share of all sampled conversations (%). Shares of work-related conversations only are published half-yearly.</p>
-                <div id="c-iwa" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Top 10 intermediate work activities by share of all sampled conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.5rem;">The ten largest intermediate work activities (IWAs) across all work activities, by share of consumer AI activity (%). Shares of work-related consumer AI activity only are published half-yearly.</p>
+                <div id="c-iwa" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Top 10 intermediate work activities by share of consumer AI activity. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div id="wa-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
               <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data</p>
@@ -189,7 +189,7 @@
               <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:flex-start;">
                 <div>
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Occupational topics</h3>
-                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of conversations by occupational topic (ISCO-08), with the professional proficiency rating of the queries. The ten largest topics are charted; the table lists all fifteen.</p>
+                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of consumer AI activity by occupational topic (ISCO-08), with the professional proficiency rating of the queries. The ten largest topics are charted; the table lists all fifteen.</p>
                 </div>
                 <button type="button" id="occ-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
@@ -199,7 +199,7 @@
                 <button type="button" class="tab-btn" role="tab" id="tab-occ-acts" aria-controls="tabpanel-occ-acts" aria-selected="false" tabindex="-1">General work activities by occupation</button>
               </div>
               <div role="tabpanel" id="tabpanel-occ-share" aria-labelledby="tab-occ-share" style="display:block;">
-                <div id="c-occ" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Top ten occupational topics by share of conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <div id="c-occ" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Top ten occupational topics by share of consumer AI activity. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div role="tabpanel" id="tabpanel-occ-prof" aria-labelledby="tab-occ-prof" style="display:none;">
                 <div id="occ-prof"></div>
@@ -216,7 +216,7 @@
               <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:flex-start;">
                 <div>
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Industry</h3>
-                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Abbreviated classification: Agriculture, Industry, 8 Services. Share of work-related conversations (%).</p>
+                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Abbreviated classification: Agriculture, Industry, 8 Services. Share of work-related consumer AI activity (%).</p>
                 </div>
                 <button type="button" id="indc-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
@@ -226,10 +226,10 @@
                 <button type="button" class="tab-btn" role="tab" id="tab-indc-gwa" aria-controls="tabpanel-indc-gwa" aria-selected="false" tabindex="-1">Work activities (GWA) by industry</button>
               </div>
               <div role="tabpanel" id="tabpanel-indc-share" aria-labelledby="tab-indc-share" style="display:block;">
-                <div id="c-indc" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Share of work-related conversations by industry. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <div id="c-indc" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Share of work-related consumer AI activity by industry. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div role="tabpanel" id="tabpanel-indc-use" aria-labelledby="tab-indc-use" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Each row shows how sampled conversations in that industry divide among Work, Personal and Education use. The three use types sum to 100%; no work-activity breakdown is combined with this view.</p>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Each row shows how consumer AI activity in that industry divides among Work, Personal and Education use. The three use types sum to 100%; no work-activity breakdown is combined with this view.</p>
                 <div id="ict-use-box" style="overflow-x:auto;"></div>
               </div>
               <div role="tabpanel" id="tabpanel-indc-gwa" aria-labelledby="tab-indc-gwa" style="display:none;">
