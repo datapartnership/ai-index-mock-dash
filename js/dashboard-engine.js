@@ -678,7 +678,7 @@ function renderCountry(root) {
     qcard('consumer'),
     qcard('api'),
     ['Primary language of AI use', c.lang, c.lang2],
-    ['Largest consumer AI topic', tl[0], 'Occupational topic with the largest share of sampled consumer AI use'],
+    ['Largest occupational topic', tl[0], 'Occupational topic with the largest share of sampled consumer AI activity'],
     ['Largest API industry', al[0], 'Industry with the largest share of API tokens']
   ];
   root.querySelector('#stat-cards').innerHTML = cards.map(k =>
