@@ -372,7 +372,7 @@ function renderBenchmark(root, code, c, q) {
   const kinds = { consumer: { id: 'c-bench-consumer', color: MCOL.consumer, light: RAMP[2] }, api: { id: 'c-bench-api', color: RAMPS.api[3], light: RAMPS.api[2] } };
   Object.keys(kinds).forEach(k => {
     const o = kinds[k];
-    setHead(o.id, IND[k], ind ? `${indName}. Index, world all-industry level in 2025 Q1 = 100` : 'All industries. Index, world in 2025 Q1 = 100');
+    setHead(o.id, `${IND[k]} growth index`, ind ? `${indName}. 2025 Q1 = 100` : 'All industries. 2025 Q1 = 100');
     const mk = (label, who, style) => Object.assign({ label, data: benchSeries(k, who, ind).slice(0, q + 1), pointRadius: 4, pointHoverRadius: 6, tension: 0.2 }, style);
     draw(o.id, {
       type: 'line',
@@ -384,7 +384,7 @@ function renderBenchmark(root, code, c, q) {
       options: {
         interaction: { mode: 'index', intersect: false },
         plugins: { legend: { labels: { usePointStyle: true } }, tooltip: { callbacks: { label: x => ` ${x.dataset.label}: ${x.parsed.y}` } } },
-        scales: { y: { beginAtZero: true, title: { display: true, text: 'Index (world, 2025 Q1 = 100)', font: { size: 11 } }, ticks: { maxTicksLimit: 7 } }, x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 12 } } }
+        scales: { y: { beginAtZero: true, title: { display: true, text: 'Growth index (2025 Q1 = 100)', font: { size: 11 } }, ticks: { maxTicksLimit: 7 } }, x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 12 } } }
       }
     });
   });
@@ -510,32 +510,35 @@ function renderUseByGwa(root, key, c) {
     ord.map((d, i) => `<tr><td style="${sTd}">${esc(d.name)}</td>${split[i].map(v => `<td style="${sTdEnd}">${v}</td>`).join('')}</tr>`).join('') + '</tbody></table>');
 }
 
-// ---------- Industry (API): small-multiple trend lines + latest-quarter ranking ----------
+// ---------- Industry (API): growth index and latest-quarter rank index ----------
 function renderIndustryTrends(root, series, q) {
   const QL = QUARTERS.slice(0, q + 1), grid = root.querySelector('#ind10-grid');
   IND10.forEach((_, i) => { const id = 'ind10-p' + i; if (charts[id]) { charts[id].destroy(); delete charts[id]; } });
   const signed = d => (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1);
-  const col = IND10.map((_, i) => series.slice(0, q + 1).map(r => r[i]));
+  const col = IND10.map((_, i) => series.slice(0, q + 1).map(r => r1(100 * r[i] / series[0][i])));
   grid.innerHTML = IND10.map((name, i) => {
-    const vals = col[i], now = vals[q], d = q > 0 ? r1(now - vals[0]) : null;
-    const dTxt = d == null ? 'First quarter in the series' : `${signed(d)} pp since ${QL[0]}`;
-    const lbl = `${name}: ${now.toFixed(1)}% of API tokens in ${QL[q]}` + (d == null ? '' : `, ${signed(d)} percentage points since ${QL[0]}`);
-    return `<div class="ind-panel" role="group" aria-label="${esc(lbl)}"><div class="ind-name">${esc(name)}</div><div class="ind-val"><strong>${now.toFixed(1)}%</strong><span>${dTxt}</span></div><div id="ind10-p${i}" class="ind-cv"><canvas role="img" aria-label="Line chart: ${esc(lbl)}" style="position:absolute;inset:0;"></canvas></div></div>`;
+    const vals = col[i], now = vals[q], d = q > 0 ? r1(now - 100) : null;
+    const dTxt = d == null ? 'Base quarter' : `${signed(d)}% since ${QL[0]}`;
+    const lbl = `${name}: growth index ${now.toFixed(1)} in ${QL[q]}` + (d == null ? '' : `, ${signed(d)}% since ${QL[0]}`);
+    return `<div class="ind-panel" role="group" aria-label="${esc(lbl)}"><div class="ind-name">${esc(name)}</div><div class="ind-val"><strong>${now.toFixed(1)}</strong><span>${dTxt}</span></div><div id="ind10-p${i}" class="ind-cv"><canvas role="img" aria-label="Growth index line chart: ${esc(lbl)}" style="position:absolute;inset:0;"></canvas></div></div>`;
   }).join('');
   IND10.forEach((name, i) => draw('ind10-p' + i, {
     type: 'line',
     data: { labels: QL, datasets: [{ label: name, data: col[i], borderColor: MCOL.api, backgroundColor: MCOL.api, borderWidth: 2, tension: 0.25, pointRadius: c => c.dataIndex === q ? 4 : 0, pointHoverRadius: 5 }] },
     options: {
-      plugins: { legend: { display: false }, tooltip: { callbacks: { title: t => t[0].label, label: c => ` ${c.parsed.y}% of API tokens` } } },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { title: t => t[0].label, label: c => ` Growth index: ${c.parsed.y.toFixed(1)} (2025 Q1 = 100)` } } },
       scales: {
-        y: { beginAtZero: true, grace: '10%', ticks: { maxTicksLimit: 3, callback: pct, font: { size: 11 } } },
+        y: { beginAtZero: true, grace: '10%', title: { display: true, text: 'Growth index (2025 Q1 = 100)', font: { size: 10 } }, ticks: { maxTicksLimit: 3, font: { size: 11 } } },
         x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 0, font: { size: 11 }, callback: function (v, j, t) { return (j === 0 || j === t.length - 1) ? this.getLabelForValue(v) : ''; } } }
       }
     }
   }));
-  hbar('c-ind10', IND10, series[q], { wrap: 46, colors: IND10.map(() => MCOL.api) });
-  root.querySelector('#ind10-table').innerHTML = `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Industry (share of API tokens, %)</th>${QL.map(l => `<th style="${sThEnd}">${l}</th>`).join('')}</tr></thead><tbody>` +
-    IND10.map((name, i) => `<tr><td style="${sTd}">${esc(name)}</td>${col[i].map(v => `<td style="${sTdEnd}">${v}</td>`).join('')}</tr>`).join('') + '</tbody></table>';
+  root.querySelector('#ind10-growth-table').innerHTML = `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Industry (growth index, 2025 Q1 = 100)</th>${QL.map(l => `<th style="${sThEnd}">${l}</th>`).join('')}</tr></thead><tbody>` +
+    IND10.map((name, i) => `<tr><td style="${sTd}">${esc(name)}</td>${col[i].map(v => `<td style="${sTdEnd}">${v.toFixed(1)}</td>`).join('')}</tr>`).join('') + '</tbody></table>';
+  const [rankLabels, rankValues] = sortDesc(IND10, series[q]);
+  hbar('c-ind10', rankLabels, rankValues, { wrap: 46, colors: rankLabels.map(() => MCOL.api) });
+  root.querySelector('#ind10-rank-table').innerHTML = `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Rank</th><th style="${sTh}">Industry</th><th style="${sThEnd}">Share of API tokens (%)</th></tr></thead><tbody>` +
+    rankLabels.map((name, i) => `<tr><td style="${sTd}">${i + 1}</td><td style="${sTd}">${esc(name)}</td><td style="${sTdEnd}">${rankValues[i]}</td></tr>`).join('') + '</tbody></table>';
 }
 
 // ---------- Occupational topics: share bars + proficiency squares ----------
@@ -1542,7 +1545,11 @@ function init(root) {
   waBtn.addEventListener('click', () => { const on = waTab.style.display === 'none'; waTab.style.display = on ? 'block' : 'none'; waBtn.setAttribute('aria-expanded', String(on)); waBtn.textContent = on ? 'Hide table' : 'Table'; });
   root.querySelector('#sel-occ-topic').addEventListener('change', ev => { occSel = ev.target.value; const code = selCountry.value; renderOccActivities(root, code, sortDesc(TOPICS, shares(code + selQ.value + 'topic', TOPICS, TOPIC_W, C[code].tilt))[0]); tblSync(root, '#occ-table', OCC_TABS); });
   [['#wa-table', WA_TABS], ['#occ-table', OCC_TABS]].forEach(([host, map]) => Object.keys(map).forEach(id => new MutationObserver(() => tblSync(root, host, map)).observe(root.querySelector('#' + id), { attributes: true, attributeFilter: ['aria-selected'] })));
-  [['occ', 'Table'], ['ind10', 'Table']].forEach(([id]) => {
+  [['occ', 'Table']].forEach(([id]) => {
+    const b = root.querySelector('#' + id + '-table-btn'), t = root.querySelector('#' + id + '-table');
+    b.addEventListener('click', () => { const on = t.style.display === 'none'; t.style.display = on ? 'block' : 'none'; b.setAttribute('aria-expanded', String(on)); b.textContent = on ? 'Hide table' : 'Table'; });
+  });
+  [['ind10-growth', 'Growth index table'], ['ind10-rank', 'Rank index table']].forEach(([id]) => {
     const b = root.querySelector('#' + id + '-table-btn'), t = root.querySelector('#' + id + '-table');
     b.addEventListener('click', () => { const on = t.style.display === 'none'; t.style.display = on ? 'block' : 'none'; b.setAttribute('aria-expanded', String(on)); b.textContent = on ? 'Hide table' : 'Table'; });
   });

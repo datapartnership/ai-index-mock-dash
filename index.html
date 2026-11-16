@@ -129,8 +129,8 @@
         <div style="margin-bottom:1.5rem;">
           <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:0.75rem 1.5rem;margin-bottom:0.75rem;">
             <div style="flex:1 1 420px;">
-              <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Benchmarking</h3>
-              <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0;">Quarterly trend for this country against the <span id="bench-region-label" style="font-weight:600;"></span> average and the world average, for each core indicator, overall or by industry. Both are indexed to the world in 2025 Q1 = 100.</p>
+              <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Growth index</h3>
+              <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0;">Quarterly growth indices for this country, the <span id="bench-region-label" style="font-weight:600;"></span> aggregate and the world. Each indicator has its own chart; 2025 Q1 = 100. These time series show change over time, not ranks.</p>
             </div>
             <div style="flex:0 1 500px;min-width:240px;display:flex;flex-direction:column;gap:0.35rem;">
               <label for="sel-ind-bench" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Industry</label>
@@ -252,21 +252,23 @@
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Industry</h3>
                   <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Abbreviated classification: Agriculture, Industry, 8 Services. Share of API tokens (%).</p>
                 </div>
-                <button type="button" id="ind10-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
               <div class="tab-bar" role="tablist" aria-label="Industry views" style="margin-bottom:1rem;">
-                <button type="button" class="tab-btn" role="tab" id="tab-ind10-trend" aria-controls="tabpanel-ind10-trend" aria-selected="true" tabindex="0">Trend over time</button>
-                <button type="button" class="tab-btn" role="tab" id="tab-ind10-latest" aria-controls="tabpanel-ind10-latest" aria-selected="false" tabindex="-1">Latest quarter</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-ind10-trend" aria-controls="tabpanel-ind10-trend" aria-selected="true" tabindex="0">Growth index</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-ind10-latest" aria-controls="tabpanel-ind10-latest" aria-selected="false" tabindex="-1">Rank index: latest quarter</button>
               </div>
               <div role="tabpanel" id="tabpanel-ind10-trend" aria-labelledby="tab-ind10-trend" style="display:block;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.75rem;">One panel per industry. Each panel has its own scale starting at zero, so compare the direction of change here and use the Latest quarter tab to compare sizes.</p>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.75rem;">One panel per industry, indexed to its own 2025 Q1 share = 100. Use this view to compare change over time; the separate Rank index tab shows latest-quarter industry shares in descending order.</p>
+                <button type="button" id="ind10-growth-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);margin-bottom:0.75rem;">Table</button>
                 <div id="ind10-grid" class="ind-grid"></div>
+                <div id="ind10-growth-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
               </div>
               <div role="tabpanel" id="tabpanel-ind10-latest" aria-labelledby="tab-ind10-latest" style="display:none;">
-                <div id="c-ind10" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Share of API tokens by industry, latest quarter. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <button type="button" id="ind10-rank-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);margin-bottom:0.75rem;">Table</button>
+                <div id="c-ind10" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Latest-quarter industry rank by share of API tokens. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <div id="ind10-rank-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
               </div>
-              <div id="ind10-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
-              <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data</p>
+              <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data. Growth indices and latest-quarter ranks are separate views.</p>
             </div>
           </div>
         </div>
