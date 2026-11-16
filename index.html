@@ -35,7 +35,7 @@
     <div style="max-width:1280px;margin:0 auto;padding:2.5rem 2rem 2.25rem;display:grid;grid-template-columns:1fr;">
       <div>
         <h1 style="font-family:var(--font-display);font-size:3rem;line-height:3.25rem;font-weight:400;color:var(--blue-12);margin:0 0 1rem;">Global AI Adoption Index</h1>
-        <p style="font-family:var(--font-body);font-size:1.125rem;line-height:1.8125rem;color:var(--gray-21);max-width:640px;margin:0;">A quarterly benchmark of where and how AI is used globally, drawn from consumer usage, API activity, and labor-market data across more than 190 economies.</p>
+        <p style="font-family:var(--font-body);font-size:1.125rem;line-height:1.8125rem;color:var(--gray-21);max-width:640px;margin:0;">A quarterly view of consumer AI use and API token volumes across more than 190 economies, alongside labor-market context.</p>
       </div>
       
     </div>
@@ -49,16 +49,16 @@
         <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:0.35rem;">
           <label for="sel-ind" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Core indicator</label>
           <select id="sel-ind" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);">
-            <option value="consumer">Consumer activity diffusion</option>
-            <option value="api">API usage volume</option>
+            <option value="consumer">Consumer AI use</option>
+            <option value="api">API token volume</option>
           </select>
         </div>
         <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:0.35rem;">
-          <label for="sel-norm" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Normalized by</label>
+          <label for="sel-norm" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Population denominator</label>
           <select id="sel-norm" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);">
-            <option value="pop">Population</option>
+            <option value="pop">Total population</option>
             <option value="wap">Working-age population</option>
-            <option value="gdp">GDP</option>
+            <option value="gdp">Gross domestic product (GDP)</option>
             <option value="gdppc">GDP per capita</option>
           </select>
         </div>
@@ -146,12 +146,12 @@
 
         <div style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-36);text-transform:uppercase;letter-spacing:1px;margin:0 0 0.5rem;">Explore this country by theme</div>
         <div class="tab-bar" role="tablist" aria-label="Country indicators by theme">
-          <button type="button" class="tab-btn" role="tab" id="tab-consumer" aria-controls="tabpanel-consumer" aria-selected="true" tabindex="0" data-tab-btn="consumer">Consumer activity diffusion</button>
-          <button type="button" class="tab-btn" role="tab" id="tab-api" aria-controls="tabpanel-api" aria-selected="false" tabindex="-1" data-tab-btn="api">API usage volume</button>
+          <button type="button" class="tab-btn" role="tab" id="tab-consumer" aria-controls="tabpanel-consumer" aria-selected="true" tabindex="0" data-tab-btn="consumer">Consumer AI use</button>
+          <button type="button" class="tab-btn" role="tab" id="tab-api" aria-controls="tabpanel-api" aria-selected="false" tabindex="-1" data-tab-btn="api">API token volume</button>
         </div>
 
         <div role="tabpanel" id="tabpanel-consumer" aria-labelledby="tab-consumer" data-tab-panel="consumer" style="display:block;">
-          <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">From sampled consumer conversations, including small firms using consumer plans. Illustrative data.</p>
+          <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">Consumer AI use is estimated from sampled conversations, including small firms using consumer plans. Illustrative data.</p>
           <div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:1.25rem;">
             <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-usetype" data-cc="1" data-title="Use type" data-sub="Share of sampled conversations (%)" data-h="140"></div></div>
             <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-lang" data-cc="1" data-title="Top languages for queries" data-sub="Share of sampled conversations (%)" data-h="140"></div></div>
@@ -242,7 +242,7 @@
         </div>
 
         <div role="tabpanel" id="tabpanel-api" aria-labelledby="tab-api" data-tab-panel="api" style="display:none;">
-          <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">From API token volumes reported by coalition firms, by country and industry. Illustrative data.</p>
+          <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">API token volume is reported by participating firms and grouped by country and industry. Illustrative data.</p>
           <div style="display:flex;flex-wrap:wrap;gap:1.25rem;">
             <div style="flex:1 1 440px;" id="c-open" data-cc="1" data-title="Open-source vs proprietary model use" data-sub="Share of API tokens (%), by quarter" data-h="280"></div>
             <div style="flex:1 1 440px;" id="c-origin" data-cc="1" data-title="Region of origin of models used" data-sub="Share of API tokens (%), by quarter" data-h="280"></div>

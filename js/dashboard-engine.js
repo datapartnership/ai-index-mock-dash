@@ -17,7 +17,7 @@ const NAVY = T.navy, ORANGE = T.orangeDark, TEAL = T.tealDark, PURPLE = T.purple
 const SERIES = [NAVY, ORANGE, TEAL, PURPLE];
 const RAMP = ['#dbe3f4', '#a9bbe3', '#6f8acb', '#34539f', NAVY];
 // Each core indicator has its own sequential ramp, so the map reads as a different measure at a glance:
-// Consumer activity diffusion = blue family, API usage volume = orange family (design-system tokens).
+// Consumer AI use = blue family, API token volume = orange family (design-system tokens).
 // Mock-profile countries are marked in near-black instead, which stays visible on both ramps.
 const HILITE = cssVar('--gray-7') || '#161616';
 const RAMPS = {
@@ -178,8 +178,8 @@ const NO_DATA = ['Taiwan','Kosovo','W. Sahara','Somaliland','N. Cyprus','Falklan
 const PROFILE = { 'Brazil': 'BR', 'Malawi': 'MW', 'United States of America': 'US' };
 const FIXED = { 'Brazil': 0.56, 'Malawi': 0.14, 'United States of America': 0.92 };
 
-const IND = { consumer: 'Consumer activity diffusion', api: 'API usage volume' };
-const NORM = { pop: 'per person', wap: 'per working-age person', gdp: 'per unit of GDP', gdppc: 'relative to GDP per capita' };
+const IND = { consumer: 'Consumer AI use', api: 'API token volume' };
+const NORM = { pop: 'per resident', wap: 'per working-age resident', gdp: 'per unit of gross domestic product', gdppc: 'relative to GDP per capita' };
 const KSLOPE = { pop: 3.0, wap: 2.9, gdp: 1.0, gdppc: 0.6 };
 const GWA = ['Getting information','Working with computers','Thinking creatively','Analyzing data or information','Documenting and recording information','Communicating with people outside the organization','Training and teaching others','Making decisions and solving problems','Interpreting the meaning of information for others','Providing consultation and advice to others'];
 const GWA_W = [13, 9, 12, 6, 12, 2, 3, 7, 3, 24];   // roughly Claude.ai shares (Anthropic Economic Index)
@@ -358,7 +358,7 @@ function renderMap(root) {
   const colors = d3.range(10).map(i => d3.interpolateRgb(ramp[0], ramp[ramp.length - 1])(i / 9));
   const scale = d3.scaleOrdinal().domain(d3.range(1, 11)).range(colors);
   paths.attr('fill', d => deciles[ind][d.properties.name] == null ? NODATA : scale(deciles[ind][d.properties.name]));
-  root.querySelector('#map-title').textContent = ind === 'consumer' ? `${IND[ind]} (based on Monthly Active Users) ${NORM[norm]}` : `${IND[ind]} ${NORM[norm]}`;
+  root.querySelector('#map-title').textContent = ind === 'consumer' ? `${IND[ind]} (based on monthly active users) ${NORM[norm]}` : `${IND[ind]} ${NORM[norm]}`;
   const chip = c => `<span style="display:inline-block;width:1rem;height:1rem;border-radius:0;margin-right:0.25rem;vertical-align:-2px;border:1px solid rgba(0,0,0,.15);background:${c}"></span>`;
   root.querySelector('#map-legend').innerHTML = colors.map((c, i) =>
     `<span>${chip(c)}Decile ${i + 1}${i === 0 ? ' (lowest)' : i === 9 ? ' (highest)' : ''}</span>`).join('') +
@@ -662,8 +662,8 @@ function renderCountry(root) {
     qcard('consumer'),
     qcard('api'),
     ['Primary language of AI use', c.lang, c.lang2],
-    ['Dominant consumer activity', tl[0], 'Occupational topic with the largest share'],
-    ['Dominant API activity', al[0], 'Industry with the largest share of tokens']
+    ['Largest consumer AI topic', tl[0], 'Occupational topic with the largest share of sampled consumer AI use'],
+    ['Largest API industry', al[0], 'Industry with the largest share of API tokens']
   ];
   root.querySelector('#stat-cards').innerHTML = cards.map(k =>
     `<div style="flex:1 1 200px;background:#fff;border:1px solid ${T.gray200};border-top:1px solid ${T.tealDark};${k[3] ? 'border-left:0.375rem solid ' + k[3] + ';' : ''}border-radius:${T.radiusLg};padding:1rem 1.125rem;box-shadow:${T.shadowSm};display:flex;flex-direction:column;">
@@ -843,10 +843,10 @@ function initModal(root) {
     } else if (kind === 'mcp') {
       copyText = JSON.stringify({ mcpServers: { 'ai-adoption-index': { type: 'http', url: 'https://mcp.ai-adoption-index.example/mcp' } } }, null, 2);
       aTitle.textContent = 'Access via MCP (proposed)';
-      aBody.innerHTML = `<p>An MCP server would let AI assistants query the Index directly, for example "compare consumer activity per working-age person in Brazil and Malawi". Placeholder configuration; the address is not real.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre><p style="margin:0;">Possible tools: <code>list_indicators</code>, <code>get_indicator</code>, <code>get_country_profile</code>, <code>compare_countries</code>.</p>`;
+      aBody.innerHTML = `<p>An MCP server would let AI assistants query the Index directly, for example "compare consumer AI use per working-age resident in Brazil and Malawi". Placeholder configuration; the address is not real.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre><p style="margin:0;">Possible tools: <code>list_indicators</code>, <code>get_indicator</code>, <code>get_country_profile</code>, <code>compare_countries</code>.</p>`;
     } else if (kind === 'pdf') {
       aTitle.textContent = 'Country report (.pdf)';
-      aBody.innerHTML = `<p>In the live site this downloads a formatted report for <strong>${esc(c.name)}, ${q}</strong>: the headline cards, every chart on the Consumer activity diffusion and API usage volume tabs, and a methods note.</p><p style="margin:0;">Not generated in this mock.</p>`;
+      aBody.innerHTML = `<p>In the live site this downloads a formatted report for <strong>${esc(c.name)}, ${q}</strong>: the headline cards, every chart on the ${esc(IND.consumer)} and ${esc(IND.api)} tabs, and a methods note.</p><p style="margin:0;">Not generated in this mock.</p>`;
     } else {
       copyText = 'country,period,section,indicator,category,value\n' +
         [['consumer', 'use_type', 'Work', c.use[0]], ['consumer', 'use_type', 'Personal', c.use[1]], ['consumer', 'use_type', 'Education', c.use[2]]].concat(c.langs.map(l => ['consumer', 'language', l[0], l[1]])).map(rw => `${c.name},${q},${rw.join(',')}`).join('\n') + '\n...';
@@ -911,7 +911,7 @@ function initQuestionFrames(root) {
 // =====================================================================
 const CX = 'Country X';
 const QX_COLS = [   // columns of the overview matrix
-  ['cons', 'Consumer activity diffusion', 0], ['api', 'API usage volume', 0],
+  ['cons', 'Consumer AI use', 0], ['api', 'API token volume', 0],
   ['use', 'Use type', 1], ['act', 'Work activity', 1], ['occ', 'Occupational topic', 1], ['ind', 'Industry', 1], ['prof', 'Proficiency', 1], ['lang', 'Language', 1], ['mod', 'API model type', 1]
 ];
 const QX_FIT = {
@@ -987,7 +987,7 @@ const QX = [
     fit: 'combined', g: { cons: 'c' }, supp: 'Connectivity',
     ask: ['Is AI use low because few people are online, or because people who are online do not use it?', 'For people who are not online, is the gap network coverage, or getting people who are covered online?', 'Among people who are covered, is the barrier the cost of data, devices or electricity?', 'If district-level Index data become available: in which districts are both connection quality and AI use low?'],
     scope: 'The Index measures use, not infrastructure. Here infrastructure means network coverage and quality, the cost of data, devices and electricity, each measured by a supplemental dataset.',
-    index: [{ k: 'c', t: 'Consumer activity diffusion', d: 'share of the working-age population using AI monthly; also per internet user' }, { k: 'c', t: 'Consumer activity diffusion by Admin 2 district', d: 'prospective; part b' }],
+    index: [{ k: 'c', t: 'Consumer AI use', d: 'share of the working-age population using AI monthly; also per internet user' }, { k: 'c', t: 'Consumer AI use by Admin 2 district', d: 'prospective; part b' }],
     supps: [{ t: 'ITU', d: 'population covered by a 4G network; internet use among people of working age (from household surveys)' }, { t: 'ITU price baskets', d: '2 GB mobile data basket as % of monthly GNI per capita' }, { t: 'ITU household ICT data, World Bank WDI', d: 'mobile phone ownership, household computers; electricity access' }, { t: 'Ookla', d: 'speed and latency tiles, fixed and mobile, aggregated to Admin 2 (part b)' }, { t: 'WorldPop or census', d: 'working-age population by Admin 2, to weight Ookla tiles and as the denominator (part b)' }],
     also: [['Ookla Open Data', QX_URL.ookla, 'speed and latency tiles of about 610 m, quarterly']],
     limits: ['Why people who are online do not use AI. The funnel locates the gap; skills, language (Question 5) and relevance explain more of it.', 'Cause, in the district view. Districts with faster connections are usually richer and more urban too, so the view ranks districts for further study; it does not show that speed drives use.', 'Small districts. Admin 2 cells below the minimum amount of activity are hidden, so the smallest rural districts, where coverage matters most, may be blank.', 'Ookla speeds come only from people who run speed tests. Districts with few tests have unreliable figures, and no tests does not mean no network.', 'Timing. ITU coverage and internet-use figures are annual and lag; the Index is quarterly.'],
@@ -1093,7 +1093,7 @@ const QX = [
     fit: 'combined', g: { cons: 'c', api: 'a', ind: 'b', mod: 'a' }, supp: 'Developers and firm surveys',
     ask: ['In which industries is AI being built into products and workflows through the API, and how does that compare with consumer AI activity at work in the same industries?', 'Do API users build on open-source or proprietary models, and from which regions?', 'How large is the developer base, and what do firm surveys say about firms’ own AI use?'],
     scope: 'The Index sees API token volumes reported by coalition firms, by country and industry. A client can be a large firm, a small business or an individual developer, and the Index cannot tell them apart, so API use measures building with AI, not enterprise adoption.',
-    index: [{ k: 'c', t: 'Consumer activity at work by industry', d: '10 industry groups, work use type' }, { k: 'a', t: 'API usage volume by industry', d: 'share of API tokens, 10 industry groups' }, { k: 'a', t: 'Open-source vs proprietary model use', d: 'share of API tokens' }, { k: 'a', t: 'Region of origin of models used', d: 'share of API tokens' }],
+    index: [{ k: 'c', t: 'Consumer AI use at work by industry', d: '10 industry groups, work use type' }, { k: 'a', t: 'API token volume by industry', d: 'share of API tokens, 10 industry groups' }, { k: 'a', t: 'Open-source vs proprietary model use', d: 'share of API tokens' }, { k: 'a', t: 'Region of origin of models used', d: 'share of API tokens' }],
     supps: [{ t: 'GitHub Innovation Graph', d: 'developers active in the country, by quarter' }, { t: 'National enterprise ICT surveys', d: 'share of firms using AI, by size and sector, where they exist' }],
     also: [['GitHub Innovation Graph', 'https://github.com/github/innovationgraph', 'developers by economy and quarter; CC0'], ['Cetic.br ICT Enterprises 2024', QX_URL.cetic, 'Brazil: 13% of enterprises with 10+ employees used AI'], ['US Census Bureau BTOS', QX_URL.btos, 'biweekly; 19.8% of US businesses used AI as of 3 May 2026']],
     limits: ['Who the API user is. Tokens are reported by country and industry only: a large firm, a small business and an individual developer look the same.', 'How many firms use AI. Tokens measure volume, so one large client can dominate an industry; only a firm survey counts firms.', 'Country attribution. Tokens are assigned to a country by the reporting firms, so AI built abroad and used in Country X may not be counted here.', 'Consumer activity by industry covers the work use type only, and the live Index hides small cells.'],
@@ -1107,7 +1107,7 @@ const QX = [
       return {
         title: `How does API use differ from consumer AI activity in ${CX}?`,
         chart: { kind: 'bars', horizontal: true, labels, unit: '%', max: qxNice([D.c, D.a], 10, 1.15), series: [{ name: 'Consumer activity at work: % of work-related consumer AI activity', color: 'consumer', data: D.c }, { name: 'API use: % of API tokens', color: 'api', data: D.a }],
-          title: `Where consumer activity and API use sit in ${CX}, by industry`, sub: 'Selected industry groups, latest quarter (%)', src: 'Index: consumer activity by industry (work use type); API usage volume by industry. Values are illustrative.', alt: `Horizontal bar chart for ${CX}: consumer activity at work and API use across six industry groups.` },
+          title: `Where consumer AI use and API tokens sit in ${CX}, by industry`, sub: 'Selected industry groups, latest quarter (%)', src: 'Index: consumer AI use by industry (work use type); API token volume by industry. Values are illustrative.', alt: `Horizontal bar chart for ${CX}: consumer AI use at work and API tokens across six industry groups.` },
         note: { head: `API use is concentrated in ${lcs(labels[ta])}`, text: [`${labels[ta]} accounts for ${D.a[ta]}% of API tokens in ${CX}, against ${D.c[ta]}% of consumer activity at work.`, `Consumer activity runs furthest ahead of API use in ${lcs(labels[ex])} (${D.c[ex]}% against ${D.a[ex]}%): people there use AI directly, while little is built on it through the API.`] },
         tiles: [{ v: os + '%', l: 'of API tokens go to open-source models', s: 'Index: open-source vs proprietary', k: 'a' }, { v: na + '%', l: 'of API tokens go to models of North American origin', s: 'Index: region of origin of models', k: 'a' }, { v: '84,000', l: 'developers active on GitHub in the latest quarter', s: 'GitHub Innovation Graph', k: 's' }, { v: '13%', l: 'of firms with 10 or more employees use AI (only where a national survey asks)', s: 'National enterprise ICT survey', k: 's' }]
       };
@@ -1179,7 +1179,7 @@ const QX = [
     fit: 'combined', g: { cons: 'c', api: 'a', use: 'c', act: 'c', ind: 'b' }, supp: 'Digital government',
     ask: ['How much API use is classified to public administration, and is it growing?', 'What is work-related AI activity in public administration about?', 'How much do people use AI to deal with forms, permits and public information?'],
     scope: 'Parts a and b use the Index’s public administration industry, which classifies activity by what it is about, not by who the user is. Part c is a proxy: the Index does not yet identify activity in which a person is dealing with a government service.',
-    index: [{ k: 'a', t: 'API usage volume by industry', d: 'public administration' }, { k: 'c', t: 'Consumer activity at work by industry and work activity', d: 'public administration' }, { k: 'c', t: 'Personal use by work activity', d: 'paperwork and rules activities (proxy, part c); by region, too rare to report by country' }, { k: 'b', t: 'Regional and world averages', d: 'the same measures, for comparison' }],
+    index: [{ k: 'a', t: 'API token volume by industry', d: 'public administration' }, { k: 'c', t: 'Consumer AI use at work by industry and work activity', d: 'public administration' }, { k: 'c', t: 'Personal use by work activity', d: 'paperwork and rules activities (proxy, part c); by region, too rare to report by country' }, { k: 'b', t: 'Regional and world aggregates', d: 'the same measures, for comparison' }],
     supps: [{ t: 'UN E-Government Survey', d: 'E-Government Development Index: how far services are online; biennial' }, { t: 'World Bank GovTech Maturity Index', d: 'government digital systems and services; 2025 update' }, { t: 'Worldwide Bureaucracy Indicators', d: 'public sector employment' }],
     also: [['UN E-Government Survey 2024', QX_URL.egdi, 'E-Government Development Index'], ['GovTech Maturity Index 2025', QX_URL.gtmi, 'World Bank'], ['Worldwide Bureaucracy Indicators', QX_URL.wwbi, 'World Bank data catalog']],
     limits: ['Who builds for government. Services built by contractors may be counted under information and communication or professional services, not public administration.', 'Citizen-facing or internal. API tokens cannot separate services for the public from back-office use.', 'People dealing with government. Part c is a proxy: the paperwork activity also covers private contracts, and most information-seeking falls under a broad “Getting information” activity. A direct measure needs a new Index classifier.', 'Who the user is. Industry is assigned from what the activity is about, so part b is not a measure of civil servants: it can include contractors, consultants and citizens doing administrative work, and public teachers and health workers fall under their own industries.', QX_MIN],
@@ -1192,7 +1192,7 @@ const QX = [
         title: `How is AI being used in and for public services in ${CX}?`,
         subA: 'Building on AI: public administration’s share of API tokens',
         chart: { kind: 'line', labels: QUARTERS, unit: '%', ymin: 0, yl: 'Share of API tokens (%)', series: [{ name: CX, color: 'api', data: ap }, { name: 'Regional average', color: '#f2b38f', data: ar, dash: true }, { name: 'World average', color: T.gray400, data: aw, dash: true }],
-          title: `Public administration: share of API tokens, ${CX}`, sub: 'By quarter (%), against the regional and world averages', src: 'Index: API usage volume by industry; regional and world averages. Values are illustrative.', alt: `Line chart: public administration’s share of API tokens in ${CX}, the region and the world, by quarter.` },
+          title: `Public administration: share of API tokens, ${CX}`, sub: 'By quarter (%), against regional and world aggregates', src: 'Index: API token volume by industry; regional and world aggregates. Values are illustrative.', alt: `Line chart: public administration’s share of API tokens in ${CX}, the region and the world, by quarter.` },
         note: { head: ap[L] > ap[0] ? 'API use in public administration is rising' : 'API use in public administration is not rising', text: [`Public administration’s share of API tokens in ${CX} went from ${ap[0]}% to ${ap[L]}%, against ${ar[L]}% for the region and ${aw[L]}% for the world in the latest quarter.`, 'Tokens do not show whether these are services for the public or internal systems.'] },
         subB: 'What work-related AI activity in public administration is about',
         chart2: { kind: 'bars', horizontal: true, labels: PA.map(x => x[0]), unit: '%', max: qxNice([PA.map(x => x[1])], 5, 1.2), series: [{ name: 'Share of work-related consumer AI activity classified to public administration (%)', color: 'consumer', data: PA.map(x => x[1]) }],
