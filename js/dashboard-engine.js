@@ -646,6 +646,7 @@ function renderCountry(root) {
   if (MAINP) {
   root.querySelector('#country-title').textContent = c.name;
   root.querySelector('#country-quarter').textContent = QUARTERS[q];
+  root.querySelector('#country-method-note').textContent = c.sample;
 
   const topicShare = shares(key + 'topic', TOPICS, TOPIC_W, c.tilt), [tl] = sortDesc(TOPICS, topicShare);
   const ind10M = shareSeries(code, 'i10', shares(code + 'i10', IND10, IND10_W, c.tilt), IND10_TREND, 0.05), api10 = ind10M[q], [al] = sortDesc(IND10, api10);

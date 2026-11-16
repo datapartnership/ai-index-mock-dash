@@ -79,6 +79,10 @@
         <x-import component-from-global-scope="WorldBankGroupDesignSystem_53b2b3.Button" variant="primary" size="sm" data-access="csv" hint-size="auto,40px">Download .csv</x-import>
         <x-import component-from-global-scope="WorldBankGroupDesignSystem_53b2b3.Button" variant="inverse" size="sm" data-access="api" hint-size="auto,40px">Access via API</x-import>
       </div>
+      <details style="margin-top:1rem;max-width:900px;color:var(--gray-36);">
+        <summary style="cursor:pointer;font-size:0.875rem;font-weight:600;color:var(--blue-45);">ⓘ Noise, sampling and disclosure</summary>
+        <p style="font-size:0.875rem;margin:0.5rem 0 0;">A published Index would add calibrated noise to aggregated consumer-activity and API-volume values before assigning countries to deciles. Deciles show broad groups, not precise ranks. Small samples and sensitive cross-tabulations may be suppressed. This mock-up uses invented values and does not implement the production noise or suppression methods.</p>
+      </details>
     </section>
 
     <section id="comparisons" style="border-top:1px solid var(--gray-91);max-width:none;padding:2.5rem 2rem;">
@@ -116,6 +120,11 @@
           <div id="country-quarter" style="font-family:var(--font-display);font-size:1.25rem;color:var(--gray-36);"></div>
         </div>
         <div id="stat-cards" style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;"></div>
+        <details style="margin-bottom:1.5rem;color:var(--gray-36);">
+          <summary style="cursor:pointer;font-size:0.875rem;font-weight:600;color:var(--blue-45);">ⓘ Country sample and disclosure assumptions</summary>
+          <p id="country-method-note" style="font-size:0.875rem;margin:0.5rem 0 0;"></p>
+          <p style="font-size:0.875rem;margin:0.5rem 0 0;">Activity shares describe sampled AI use, not the share of people or firms using AI. In a live release, small or sensitive breakdowns would be withheld; all values shown here are illustrative.</p>
+        </details>
 
         <div style="margin-bottom:1.5rem;">
           <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:0.75rem 1.5rem;margin-bottom:0.75rem;">
