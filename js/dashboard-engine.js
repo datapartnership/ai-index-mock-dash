@@ -256,7 +256,7 @@ const C = {
     sample: 'Sample: about 400,000 classified conversations this quarter (100,000 per firm, four firms; tier 1). All cross-tabs are available.',
     use: [44, 34, 22], langs: [['Portuguese', 86], ['English', 10], ['Spanish', 3], ['Other', 1]],
     peaks: [[15, 1], [21, 0.8]], tilt: { 'Write material for artistic or commercial purposes': 1.25, 'Business and administration': 1.2, 'Writing, translation, and the arts': 1.3, 'L Financial and insurance': 1.5, 'Financial and insurance activities': 1.6, 'Agriculture, forestry and fishing': 1.6, 'A Agriculture, forestry, fishing': 1.6 },
-    ct: [true, true, true], open: [31, 38], origin: [71, 17, 8, 4],
+    ct: [true, true, true, true], open: [31, 38], origin: [71, 17, 8, 4],
     lfpr: [61.9, 62.4], adopt: [[9, 19], [12, 22]], skills: [62, 48, 51, 44, 38, 47], eduAtt: [58, 22, 3], eduUse: [17, 22],
     opps: [['AI engineer', 84], ['AI trainer and data annotator', 61], ['Conversation designer', 47], ['ML operations engineer', 39], ['AI compliance analyst', 33]],
     insights: [
@@ -268,10 +268,10 @@ const C = {
   },
   MW: {
     name: 'Malawi', index: [6.1, 12.4], rank: 151, lang: 'English', lang2: 'Chichewa is second, at about 22%',
-    sample: 'Sample: Malawi is pooled each quarter with six Eastern African neighbours (about 80,000 classified conversations for the group: 20,000 per firm, four firms). Country figures shown are annual where firms’ volumes allow. The industry-by-use cross-tab is suppressed for statistical disclosure control; broader occupation-by-GWA values may be reportable. API estimates carry wide uncertainty.',
+    sample: 'Sample: Malawi is pooled each quarter with six Eastern African neighbours (about 80,000 classified conversations for the group: 20,000 per firm, four firms). Country figures shown are annual where firms’ volumes allow. In this mock, the industry-by-use breakdown is suppressed while broader GWA views are shown; live availability depends on sample thresholds. API estimates carry wide uncertainty.',
     use: [28, 27, 45], langs: [['English', 71], ['Chichewa', 22], ['Chitumbuka', 3], ['Other', 4]],
     peaks: [[20, 1], [13, 0.45]], tilt: { 'Training and teaching others': 1.8, 'Getting information': 1.3, 'Teaching': 2.2, 'Skilled agricultural, forestry, and fishery': 3, 'Information and communications technology': 0.5, 'Explain technical details of products or services': 1.7, 'Prepare informational or instructional materials': 1.5, 'Interpret language, cultural, or religious information for others': 1.5, 'Program computer systems or production equipment': 0.5, 'Q Education': 2.2, 'A Agriculture, forestry, fishing': 3.5, 'K Telecoms, computing, information services': 0.6, 'Agriculture, forestry and fishing': 3, 'Education': 2.2, 'Public administration': 1.6, 'Human health and social work': 1.5 },
-    ct: [true, false, true], open: [55, 62], origin: [58, 29, 7, 6],
+    ct: [true, false, true, true], open: [55, 62], origin: [58, 29, 7, 6],
     lfpr: [72.6, 73.1], adopt: [[0.8, 2.6], [1.0, 3.1]], skills: [34, 12, 15, 9, 14, 11], eduAtt: [14, 3, 0.5], eduUse: [38, 45],
     opps: [['Local-language data annotator', 72], ['Digital agriculture advisor', 54], ['EdTech content developer', 41], ['Mobile money data analyst', 36], ['AI support officer (NGO programmes)', 28]],
     insights: [
@@ -286,7 +286,7 @@ const C = {
     sample: 'Sample: about 400,000 classified conversations this quarter (100,000 per firm, four firms; tier 1). All cross-tabs are available. State-level figures are published in the US sub-national index.',
     use: [52, 33, 15], langs: [['English', 88], ['Spanish', 8], ['Chinese', 1.5], ['Other', 2.5]],
     peaks: [[11, 1], [14, 0.95], [21, 0.5]], tilt: { 'Working with computers': 1.5, 'Analyzing data or information': 1.3, 'Information and communications technology': 1.6, 'Science and engineering': 1.3, 'Program computer systems or production equipment': 1.6, 'K Telecoms, computing, information services': 1.4, 'N Professional, scientific, technical': 1.2, 'Information and communication': 1.3 },
-    ct: [true, true, true], open: [18, 22], origin: [89, 6, 4, 1],
+    ct: [true, true, true, true], open: [18, 22], origin: [89, 6, 4, 1],
     lfpr: [62.5, 62.6], adopt: [[21, 38], [24, 41]], skills: [81, 77, 72, 70, 58, 79], eduAtt: [91, 38, 14], eduUse: [13, 15],
     opps: [['AI engineer', 68], ['Agent orchestration engineer', 63], ['AI governance lead', 44], ['Forward-deployed engineer', 41], ['AI trainer (domain expert)', 35]],
     insights: [
@@ -599,24 +599,37 @@ function renderOccActivities(root, code, topicsBySize) {
     ord.map(i => `<tr><td style="${sTd}">${esc(GWA[i])}</td><td style="${sTdEnd}">${mine[i]}</td><td style="${sTdEnd}">${avg[i].toFixed(1)}</td><td style="${sTdEnd}">${(mine[i] - avg[i] >= 0 ? '+' : '\u2212') + Math.abs(mine[i] - avg[i]).toFixed(1)}</td></tr>`).join('') + '</tbody></table>');
 }
 
-// ---------- Industry (consumer): ranked bars + industry x use type x work activity ----------
-function ictMatrix(key, c, use) {
-  const one = u => IND10.map((_, i) => {
-    const raw = GWA_W.map((w, g) => w * ((ICT_AFF[i] || {})[g] || 1) * ICT_USE[u][g] * (0.85 + 0.3 * h(key + u + i + g)));
+// ---------- Industry (consumer): separate use-type and work-activity views ----------
+function ictMatrix(key) {
+  return IND10.map((_, i) => {
+    const raw = GWA_W.map((w, g) => w * ((ICT_AFF[i] || {})[g] || 1) * ICT_USE.Work[g] * (0.85 + 0.3 * h(key + 'Work' + i + g)));
     const s = raw.reduce((a, b) => a + b, 0); return raw.map(v => 100 * v / s);
   });
-  if (use !== 'all') return one(use);
-  const mats = ['Work', 'Personal', 'Education'].map(one), wts = c.use.map(v => v / 100);
-  return IND10.map((_, i) => GWA.map((_, g) => mats.reduce((a, m, u) => a + wts[u] * m[i][g], 0)));
+}
+function industryUseShares(key, c) {
+  return IND10.map((_, i) => to100(USE_NAMES.map((use, ui) => c.use[ui] * GWA_W.reduce((sum, weight, g) =>
+    sum + weight * ((ICT_AFF[i] || {})[g] || 1) * ICT_USE[use][g] * (0.85 + 0.3 * h(key + 'industry-use' + ui + i + g)), 0))));
+}
+function renderIndustryUseCross(root, key, c) {
+  const box = root.querySelector('#ict-use-box');
+  if (!c.ct[1]) {
+    box.innerHTML = `<div style="border-left:0.375rem solid ${T.orangeDark};background:${T.gray50};padding:0.75rem 1rem;"><strong>Not available for ${esc(c.name)}.</strong> The industry-by-use sample is below the disclosure threshold.</div>`;
+    return;
+  }
+  const values = industryUseShares(key, c);
+  const rows = IND10.map((name, i) => `<tr><th scope="row" style="${sTd}font-weight:500;">${esc(name)}</th>${values[i].map((v, ui) =>
+    `<td style="${sTdEnd}background:${USE_COL[ui]}18;color:${T.gray800};">${v}%</td>`).join('')}</tr>`).join('');
+  box.innerHTML = `<table style="${sTableBase}"><caption style="text-align:left;color:${T.gray600};padding:0.5rem 0;">Share of sampled conversations within each industry; each row sums to 100%.</caption><thead><tr><th style="${sTh}">Industry</th>${USE_NAMES.map((use, ui) => `<th style="${sThEnd}color:${USE_COL[ui]};">${esc(use)} (%)</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 function renderIndustryCross(root, key, c, indW) {
   const box = root.querySelector('#ict-box');
-  if (!c.ct[1]) {
-    box.innerHTML = `<div style="border-left:0.375rem solid ${T.orangeDark};background:${T.gray50};padding:0.75rem 1rem;"><strong>Not available for ${esc(c.name)}.</strong> The sample is below the disclosure threshold for this cross-tab. It will appear when the sample is large enough.</div>`;
+  renderIndustryUseCross(root, key, c);
+  if (!c.ct[3]) {
+    box.innerHTML = `<div style="border-left:0.375rem solid ${T.orangeDark};background:${T.gray50};padding:0.75rem 1rem;"><strong>Not available for ${esc(c.name)}.</strong> The industry-by-GWA sample is below the disclosure threshold.</div>`;
     return;
   }
-  const use = root.querySelector('#sel-ict-use').value, view = root.querySelector('#sel-ict-view').value;
-  const m = ictMatrix(key, c, use), tw = indW.reduce((a, b) => a + b, 0);
+  const view = root.querySelector('#sel-ict-view').value;
+  const m = ictMatrix(key), tw = indW.reduce((a, b) => a + b, 0);
   const avg = GWA.map((_, g) => m.reduce((a, rw, i) => a + rw[g] * indW[i] / tw, 0));
   const val = (i, g) => view === 'share' ? m[i][g] : 100 * m[i][g] / avg[g];
   const all = IND10.flatMap((_, i) => GWA.map((_, g) => val(i, g)));
@@ -628,9 +641,9 @@ function renderIndustryCross(root, key, c, indW) {
     order.map(j => { const g = GWA[j], v = val(i, j), bg = ramp(t(v)), txt = view === 'share' ? v.toFixed(1) : String(Math.round(v)), strong = view === 'index' && v >= 150;
       return `<td title="${esc(name)} / ${esc(g)}: ${txt}${view === 'share' ? '%' : ''}" style="text-align:center;padding:0.5rem 0.125rem;background:${bg};color:${inkOn(bg)};font-size:0.8125rem;${strong ? 'font-weight:700;' : ''}">${txt}</td>`; }).join('') + '</tr>').join('');
   const note = view === 'share'
-    ? 'Each row adds to 100%. Darker cells are a bigger share of that industry\'s conversations.'
+    ? 'Each row adds to 100%. Darker cells are a bigger share of that industry\'s work-related AI use.'
     : '100 = the average industry. 150 means the industry does one and a half times as much of that activity as the average. Cells at or above 150 are in bold; cells below 100 are left pale.';
-  box.innerHTML = `<table style="border-collapse:separate;border-spacing:2px;width:100%;min-width:980px;table-layout:fixed;"><caption style="text-align:left;font-size:0.8125rem;color:${T.gray600};padding-bottom:0.5rem;caption-side:bottom;">${esc(note)}</caption><colgroup><col style="width:24%">${GWA.map(() => '<col>').join('')}</colgroup><thead><tr><th scope="col" style="text-align:left;vertical-align:bottom;font-weight:600;font-size:0.75rem;padding:0 0.5rem 0.4rem 0;color:${T.gray800};">Industry / work activity (largest first)</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+  box.innerHTML = `<table style="border-collapse:separate;border-spacing:2px;width:100%;min-width:980px;table-layout:fixed;"><caption style="text-align:left;font-size:0.8125rem;color:${T.gray600};padding-bottom:0.5rem;caption-side:bottom;">${esc(note)}</caption><colgroup><col style="width:24%">${GWA.map(() => '<col>').join('')}</colgroup><thead><tr><th scope="col" style="text-align:left;vertical-align:bottom;font-weight:600;font-size:0.75rem;padding:0 0.5rem 0.4rem 0;color:${T.gray800};">Industry / general work activity (GWA, largest first)</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 function renderIndustryConsumer(root, key, c) {
   const vals = shares(key + 'i10c', IND10, IND10C_W, c.tilt);
@@ -1555,7 +1568,7 @@ function init(root) {
   });
   { const b = root.querySelector('#indc-table-btn'), t = root.querySelector('#indc-table');
     b.addEventListener('click', () => { const on = t.style.display === 'none'; t.style.display = on ? 'block' : 'none'; b.setAttribute('aria-expanded', String(on)); b.textContent = on ? 'Hide table' : 'Table'; });
-    ['#sel-ict-use', '#sel-ict-view'].forEach(sel => root.querySelector(sel).addEventListener('change', () => { const code = selCountry.value; renderIndustryCross(root, code + selQ.value, C[code], IND10C_W); })); }
+    root.querySelector('#sel-ict-view').addEventListener('change', () => { const code = selCountry.value; renderIndustryCross(root, code + selQ.value, C[code], IND10C_W); }); }
   const selBenchInd = root.querySelector('#sel-ind-bench');
   selBenchInd.innerHTML = BENCH_INDUSTRIES.map((n, i) => `<option value="${i}">${esc(n)}</option>`).join('');
   selBenchInd.addEventListener('change', () => { const code = selCountry.value; renderBenchmark(root, code, C[code], +selQ.value); });

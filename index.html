@@ -222,21 +222,25 @@
               </div>
               <div class="tab-bar" role="tablist" aria-label="Industry views" style="margin-bottom:1rem;">
                 <button type="button" class="tab-btn" role="tab" id="tab-indc-share" aria-controls="tabpanel-indc-share" aria-selected="true" tabindex="0">Share by industry</button>
-                <button type="button" class="tab-btn" role="tab" id="tab-indc-cross" aria-controls="tabpanel-indc-cross" aria-selected="false" tabindex="-1">By use type and work activity</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-indc-use" aria-controls="tabpanel-indc-use" aria-selected="false" tabindex="-1">Use type by industry</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-indc-gwa" aria-controls="tabpanel-indc-gwa" aria-selected="false" tabindex="-1">Work activities (GWA) by industry</button>
               </div>
               <div role="tabpanel" id="tabpanel-indc-share" aria-labelledby="tab-indc-share" style="display:block;">
                 <div id="c-indc" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Share of work-related conversations by industry. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
-              <div role="tabpanel" id="tabpanel-indc-cross" aria-labelledby="tab-indc-cross" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Read across a row: what each industry's conversations are about. Choose a use type to filter, and switch the view to see where an industry does more of an activity than the average industry.</p>
+              <div role="tabpanel" id="tabpanel-indc-use" aria-labelledby="tab-indc-use" style="display:none;">
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Each row shows how sampled conversations in that industry divide among Work, Personal and Education use. The three use types sum to 100%; no work-activity breakdown is combined with this view.</p>
+                <div id="ict-use-box" style="overflow-x:auto;"></div>
+              </div>
+              <div role="tabpanel" id="tabpanel-indc-gwa" aria-labelledby="tab-indc-gwa" style="display:none;">
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">This view shows general work activities (GWAs) within each industry's work-related AI use. It is separate from the use-type breakdown above; use the selector only to compare shares with the average industry.</p>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
-                  <div style="display:flex;flex-direction:column;gap:0.35rem;min-width:13rem;"><label for="sel-ict-use" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">USE TYPE</label><select id="sel-ict-use" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"><option value="all">All use types</option><option value="Work">Work</option><option value="Personal">Personal</option><option value="Education">Education</option></select></div>
-                  <div style="display:flex;flex-direction:column;gap:0.35rem;min-width:18rem;"><label for="sel-ict-view" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">VIEW</label><select id="sel-ict-view" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"><option value="share">Share of the industry's conversations</option><option value="index">Compared with the average industry</option></select></div>
+                  <div style="display:flex;flex-direction:column;gap:0.35rem;min-width:18rem;"><label for="sel-ict-view" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">WORK ACTIVITY VIEW</label><select id="sel-ict-view" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"><option value="share">Share of work-related AI use in industry</option><option value="index">Compared with the average industry</option></select></div>
                 </div>
                 <div id="ict-box" style="overflow-x:auto;"></div>
               </div>
               <div id="indc-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
-              <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data. Industry views cover work-related use only, and in the live Index cells may be suppressed where the sample is small.</p>
+              <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data. Industry by use type and industry by GWA are separate two-way views; the GWA view covers Work use only. The mock-up does not combine industry, use type and GWA in one cross-tab. A live Index may suppress cells below sample thresholds.</p>
             </div>
           </div>
         </div>
