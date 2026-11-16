@@ -1411,7 +1411,7 @@ function qxBody(i) {
     <section class="qx-step"><div class="qx-sh"><span class="qx-num">1</span><h3>Questions identified by stakeholders</h3></div>
       <h2 class="qx-h2">${esc(b.title)}</h2>
       <div class="qx-asked"><span class="qx-askl">Asked by</span>${asked}</div></section>
-    <section class="qx-step"><div class="qx-sh"><span class="qx-num">2</span><h3>Investments and Decisions these questions are useful for</h3></div>
+    <section class="qx-step"><div class="qx-sh"><span class="qx-num">2</span><h3>Investments and decisions these questions are useful for</h3></div>
       <h4 class="qx-context-h">Context and potential impact</h4><ul class="qx-bul">${(q.context || q.use || b.use).map(u => `<li>${esc(u)}</li>`).join('')}</ul></section>
     <section class="qx-step"><div class="qx-sh"><span class="qx-num">3</span><h3>Data we can combine</h3></div>
       <div class="qx-combine">
