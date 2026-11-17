@@ -35,7 +35,7 @@
     <div style="max-width:1280px;margin:0 auto;padding:2.5rem 2rem 2.25rem;display:grid;grid-template-columns:1fr;">
       <div>
         <h1 style="font-family:var(--font-display);font-size:3rem;line-height:3.25rem;font-weight:400;color:var(--blue-12);margin:0 0 1rem;">Global AI Adoption Index</h1>
-        <p style="font-family:var(--font-body);font-size:1.125rem;line-height:1.8125rem;color:var(--gray-21);max-width:640px;margin:0;">A quarterly benchmark of where and how AI is used globally, drawn from consumer usage, API activity, and labor-market data across more than 190 economies.</p>
+        <p style="font-family:var(--font-body);font-size:1.125rem;line-height:1.8125rem;color:var(--gray-21);max-width:640px;margin:0;">A quarterly view of consumer AI use and API token volumes across more than 190 economies, alongside labor-market context.</p>
       </div>
       
     </div>
@@ -49,31 +49,28 @@
         <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:0.35rem;">
           <label for="sel-ind" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Core indicator</label>
           <select id="sel-ind" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);">
-            <option value="consumer">Consumer activity diffusion</option>
-            <option value="api">API usage volume</option>
+            <option value="consumer">Consumer AI use</option>
+            <option value="api">API token volume</option>
           </select>
         </div>
         <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:0.35rem;">
-          <label for="sel-norm" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Normalized by</label>
+          <label for="sel-norm" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Population denominator</label>
           <select id="sel-norm" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);">
-            <option value="pop">Population</option>
+            <option value="pop">Total population</option>
             <option value="wap">Working-age population</option>
-            <option value="gdp">GDP</option>
+            <option value="gdp">Gross domestic product (GDP)</option>
             <option value="gdppc">GDP per capita</option>
           </select>
         </div>
       </div>
 
       <div style="display:flex;flex-wrap:wrap;align-items:stretch;gap:1.25rem;">
-        <div style="flex:2 1 0%;min-width:340px;background:#fff;border:1px solid var(--gray-91);border-top:1px solid var(--teal-60);border-radius:var(--radius-none);padding:1.25rem 1.5rem;box-shadow:var(--shadow-card);">
+        <div style="flex:1 1 100%;min-width:340px;background:#fff;border:1px solid var(--gray-91);border-top:1px solid var(--teal-60);border-radius:var(--radius-none);padding:1.25rem 1.5rem;box-shadow:var(--shadow-card);">
           <h3 id="map-title" style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);"></h3>
-          <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;">World median = 100. Hover a country for both indicators. Countries outlined in black have a mock profile below; click one to open it.</p>
+          <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;">Countries are grouped into ten deciles for the selected indicator. Decile 1 is the lowest group and decile 10 the highest; no exact country rank is shown. Countries outlined in black have a mock profile below; click one to open it.</p>
           <div id="map" style="position:relative;background:#fff;"><div id="map-tip" style="position:absolute;pointer-events:none;background:#fff;border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.4rem 0.65rem;font-size:0.8125rem;box-shadow:var(--shadow-dropdown);max-width:16rem;display:none;z-index:5;"></div></div>
           <div id="map-legend" style="display:flex;flex-wrap:wrap;gap:0.75rem;font-size:0.8125rem;align-items:center;margin-top:0.5rem;"></div>
           <p style="font-size:0.75rem;color:var(--gray-44);margin:0.5rem 0 0;">Illustrative data. Boundaries are Natural Earth placeholders, not cleared World Bank boundaries.</p>
-        </div>
-        <div style="flex:1 1 0%;min-width:260px;display:flex;">
-          <div id="c-scatter" data-cc="1" data-title="" data-sub="" data-h="200" style="flex:1;"></div>
         </div>
       </div>
 
@@ -82,35 +79,16 @@
         <x-import component-from-global-scope="WorldBankGroupDesignSystem_53b2b3.Button" variant="primary" size="sm" data-access="csv" hint-size="auto,40px">Download .csv</x-import>
         <x-import component-from-global-scope="WorldBankGroupDesignSystem_53b2b3.Button" variant="inverse" size="sm" data-access="api" hint-size="auto,40px">Access via API</x-import>
       </div>
+      <details style="margin-top:1rem;max-width:900px;color:var(--gray-36);">
+        <summary style="cursor:pointer;font-size:0.875rem;font-weight:600;color:var(--blue-45);">ⓘ Noise, sampling and disclosure</summary>
+        <p style="font-size:0.875rem;margin:0.5rem 0 0;">A published Index would add calibrated noise to aggregated consumer-activity and API-volume values before assigning countries to deciles. Deciles show broad groups, not precise ranks. Small samples and sensitive cross-tabulations may be suppressed. This mock-up uses invented values and does not implement the production noise or suppression methods.</p>
+      </details>
     </section>
 
     <section id="comparisons" style="border-top:1px solid var(--gray-91);max-width:none;padding:2.5rem 2rem;">
       <div style="max-width:1280px;margin:0 auto;">
-        <h2 style="font-family:var(--font-display);color:var(--blue-12);font-size:1.6rem;margin:0 0 0.5rem;">Comparisons</h2>
-        <p style="font-size:1rem;color:var(--gray-36);max-width:760px;margin:0 0 1.5rem;">How closely do Consumer activity diffusion and API usage volume track other country characteristics? Pick a comparator to plot both indicators against it. Each dot is a country; the dashed line is the fitted trend and R² is the share of variation it explains.</p>
-
-        <div style="background:#fff;border:1px solid var(--gray-91);border-top:1px solid var(--teal-60);border-radius:var(--radius-none);padding:1.25rem 1.5rem;margin-bottom:1.5rem;box-shadow:var(--shadow-card);display:flex;flex-wrap:wrap;gap:1rem;">
-          <div style="flex:1 1 320px;display:flex;flex-direction:column;gap:0.35rem;">
-            <label for="sel-cor" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Compare with</label>
-            <select id="sel-cor" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"></select>
-          </div>
-          <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:0.35rem;">
-            <label for="sel-norm-cmp" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Normalized by</label>
-            <select id="sel-norm-cmp" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"></select>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-wrap:wrap;gap:1.25rem;">
-          <div style="flex:1 1 460px;min-width:0;" id="c-cmp-consumer" data-cc="1" data-title="" data-sub="" data-h="380"></div>
-          <div style="flex:1 1 460px;min-width:0;" id="c-cmp-api" data-cc="1" data-title="" data-sub="" data-h="380"></div>
-        </div>
-        <p style="font-size:0.75rem;color:var(--gray-44);margin:0.5rem 0 0;">Illustrative data. R² and the trend line are fitted on the log of each indicator, so a line looks straight on these axes. Correlation is not causation.</p>
-
-        <div style="display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;margin-top:1.25rem;">
-          <span style="font-weight:500;margin-right:0.25rem;">Get this data:</span>
-          <x-import component-from-global-scope="WorldBankGroupDesignSystem_53b2b3.Button" variant="primary" size="sm" data-access="cmpcsv" hint-size="auto,40px">Download .csv</x-import>
-          <x-import component-from-global-scope="WorldBankGroupDesignSystem_53b2b3.Button" variant="inverse" size="sm" data-access="cmpapi" hint-size="auto,40px">Access via API</x-import>
-        </div>
+        <h2 style="font-family:var(--font-display);color:var(--blue-12);font-size:1.6rem;margin:0 0 0.5rem;">How to read the deciles</h2>
+        <p style="font-size:1rem;color:var(--gray-36);max-width:760px;margin:0;">The map groups countries by the selected indicator rather than comparing values with a world median or displaying precise ranks. In a published Index, deciles would be calculated from noise-aggregated values; the figures in this mock-up are illustrative.</p>
       </div>
     </section>
 
@@ -142,12 +120,17 @@
           <div id="country-quarter" style="font-family:var(--font-display);font-size:1.25rem;color:var(--gray-36);"></div>
         </div>
         <div id="stat-cards" style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;"></div>
+        <details style="margin-bottom:1.5rem;color:var(--gray-36);">
+          <summary style="cursor:pointer;font-size:0.875rem;font-weight:600;color:var(--blue-45);">ⓘ Country sample and disclosure assumptions</summary>
+          <p id="country-method-note" style="font-size:0.875rem;margin:0.5rem 0 0;"></p>
+          <p style="font-size:0.875rem;margin:0.5rem 0 0;">Activity shares describe sampled AI use, not the share of people or firms using AI. In a live release, small or sensitive breakdowns would be withheld; all values shown here are illustrative.</p>
+        </details>
 
         <div style="margin-bottom:1.5rem;">
           <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:0.75rem 1.5rem;margin-bottom:0.75rem;">
             <div style="flex:1 1 420px;">
-              <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Benchmarking</h3>
-              <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0;">Quarterly trend for this country against the <span id="bench-region-label" style="font-weight:600;"></span> average and the world average, for each core indicator, overall or by industry. Both are indexed to the world in 2025 Q1 = 100.</p>
+              <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Growth index</h3>
+              <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0;">Quarterly growth indices for this country, the <span id="bench-region-label" style="font-weight:600;"></span> aggregate and the world. Each indicator has its own chart; 2025 Q1 = 100. These time series show change over time, not ranks.</p>
             </div>
             <div style="flex:0 1 500px;min-width:240px;display:flex;flex-direction:column;gap:0.35rem;">
               <label for="sel-ind-bench" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">Industry</label>
@@ -163,20 +146,20 @@
 
         <div style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-36);text-transform:uppercase;letter-spacing:1px;margin:0 0 0.5rem;">Explore this country by theme</div>
         <div class="tab-bar" role="tablist" aria-label="Country indicators by theme">
-          <button type="button" class="tab-btn" role="tab" id="tab-consumer" aria-controls="tabpanel-consumer" aria-selected="true" tabindex="0" data-tab-btn="consumer">Consumer activity diffusion</button>
-          <button type="button" class="tab-btn" role="tab" id="tab-api" aria-controls="tabpanel-api" aria-selected="false" tabindex="-1" data-tab-btn="api">API usage volume</button>
+          <button type="button" class="tab-btn" role="tab" id="tab-consumer" aria-controls="tabpanel-consumer" aria-selected="true" tabindex="0" data-tab-btn="consumer">Consumer AI use</button>
+          <button type="button" class="tab-btn" role="tab" id="tab-api" aria-controls="tabpanel-api" aria-selected="false" tabindex="-1" data-tab-btn="api">API token volume</button>
         </div>
 
         <div role="tabpanel" id="tabpanel-consumer" aria-labelledby="tab-consumer" data-tab-panel="consumer" style="display:block;">
-          <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">From sampled consumer conversations, including small firms using consumer plans. Illustrative data.</p>
+          <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">Consumer AI use is estimated from sampled conversations, including small firms using consumer plans. Illustrative data.</p>
           <div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:1.25rem;">
-            <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-usetype" data-cc="1" data-title="Use type" data-sub="Share of sampled conversations (%)" data-h="140"></div></div>
-            <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-lang" data-cc="1" data-title="Top languages for queries" data-sub="Share of sampled conversations (%)" data-h="140"></div></div>
+            <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-usetype" data-cc="1" data-title="Use type" data-sub="Share of consumer AI activity (%)" data-h="140"></div></div>
+            <div style="grid-column:span 6;display:flex;"><div style="flex:1;" id="c-lang" data-cc="1" data-title="Top languages for queries" data-sub="Share of consumer AI activity (%)" data-h="140"></div></div>
                         <div id="wa-card" style="grid-column:1/-1;background:#fff;border:1px solid var(--gray-91);border-top:1px solid var(--teal-60);padding:1.25rem 1.5rem;box-shadow:var(--shadow-card);">
               <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:flex-start;">
                 <div>
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Work activities</h3>
-                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of all sampled conversations (work, personal and education) by O*NET work activity, this quarter. Each general work activity (GWA) contains intermediate work activities (IWAs); those shown can be reported for every country each quarter.</p>
+                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of consumer AI activity (work, personal and education) by O*NET work activity, this quarter. Each general work activity (GWA) contains intermediate work activities (IWAs); those shown can be reported for every country each quarter.</p>
                 </div>
                 <button type="button" id="wa-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
@@ -191,13 +174,13 @@
                 <div id="wa-detail" aria-live="polite" style="margin-top:1.5rem;"></div>
               </div>
               <div role="tabpanel" id="tabpanel-wa-use" aria-labelledby="tab-wa-use" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.75rem;max-width:760px;">For each work activity, how its conversations split between work, personal and education use. Each bar adds to 100%. Activities are listed largest first.</p>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.75rem;max-width:760px;">For each work activity, how consumer AI activity splits between work, personal and education use. Each bar adds to 100%. Activities are listed largest first.</p>
                 <div id="wa-use-msg" style="display:none;"></div>
-                <div id="c-wause" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Use type split for each work activity: work, personal and education, as shares of that activity's conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <div id="c-wause" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Use type split for each work activity: work, personal and education, as shares of consumer AI activity. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div role="tabpanel" id="tabpanel-wa-top" aria-labelledby="tab-wa-top" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.5rem;">The ten largest intermediate work activities (IWAs) across all work activities, share of all sampled conversations (%). Shares of work-related conversations only are published half-yearly.</p>
-                <div id="c-iwa" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Top 10 intermediate work activities by share of all sampled conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.5rem;">The ten largest intermediate work activities (IWAs) across all work activities, by share of consumer AI activity (%). Shares of work-related consumer AI activity only are published half-yearly.</p>
+                <div id="c-iwa" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Top 10 intermediate work activities by share of consumer AI activity. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div id="wa-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
               <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data</p>
@@ -206,23 +189,23 @@
               <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:flex-start;">
                 <div>
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Occupational topics</h3>
-                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of conversations by occupational topic (ISCO-08), with the professional proficiency rating of the queries. The ten largest topics are charted; the table lists all fifteen.</p>
+                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Share of consumer AI activity by occupational topic (ISCO-08), with the professional proficiency rating of the queries. The ten largest topics are charted; the table lists all fifteen.</p>
                 </div>
                 <button type="button" id="occ-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
               <div class="tab-bar" role="tablist" aria-label="Occupational topic views" style="margin-bottom:1rem;">
                 <button type="button" class="tab-btn" role="tab" id="tab-occ-share" aria-controls="tabpanel-occ-share" aria-selected="true" tabindex="0">Share by occupation</button>
                 <button type="button" class="tab-btn" role="tab" id="tab-occ-prof" aria-controls="tabpanel-occ-prof" aria-selected="false" tabindex="-1">View occupation by proficiency</button>
-                <button type="button" class="tab-btn" role="tab" id="tab-occ-acts" aria-controls="tabpanel-occ-acts" aria-selected="false" tabindex="-1">Intermediate work activities by occupation</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-occ-acts" aria-controls="tabpanel-occ-acts" aria-selected="false" tabindex="-1">General work activities by occupation</button>
               </div>
               <div role="tabpanel" id="tabpanel-occ-share" aria-labelledby="tab-occ-share" style="display:block;">
-                <div id="c-occ" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Top ten occupational topics by share of conversations. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <div id="c-occ" style="position:relative;min-height:440px;"><canvas role="img" aria-label="Top ten occupational topics by share of consumer AI activity. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
               <div role="tabpanel" id="tabpanel-occ-prof" aria-labelledby="tab-occ-prof" style="display:none;">
                 <div id="occ-prof"></div>
               </div>
               <div role="tabpanel" id="tabpanel-occ-acts" aria-labelledby="tab-occ-acts" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Choose an occupational topic to see which intermediate work activities (IWAs) its conversations are about. Activities within an occupation are smaller cells, so they are published annually by country (four quarters pooled) and quarterly by region. Each bar is that activity's share of the occupation's conversations. The black marker is its share across all occupations together, so a bar that runs past the marker is something this occupation does more than most.</p>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Choose an occupational topic to see the share of its work-related AI use across broad O*NET general work activities (GWAs). Each GWA groups multiple, more-specific intermediate work activities (IWAs), reducing the number of small cross-tabulations. The black marker is the weighted average across occupational topics, not a rank. In a live Index, publication cadence and suppression would depend on sample size; these values are illustrative.</p>
                 <div style="display:flex;flex-direction:column;gap:0.35rem;min-width:18rem;max-width:26rem;margin-bottom:1rem;"><label for="sel-occ-topic" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">OCCUPATIONAL TOPIC</label><select id="sel-occ-topic" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"></select></div>
                 <div id="occ-acts" aria-live="polite"></div>
               </div>
@@ -233,33 +216,37 @@
               <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:flex-start;">
                 <div>
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Industry</h3>
-                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Abbreviated classification: Agriculture, Industry, 8 Services. Share of work-related conversations (%).</p>
+                  <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Abbreviated classification: Agriculture, Industry, 8 Services. Share of work-related consumer AI activity (%).</p>
                 </div>
                 <button type="button" id="indc-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
               <div class="tab-bar" role="tablist" aria-label="Industry views" style="margin-bottom:1rem;">
                 <button type="button" class="tab-btn" role="tab" id="tab-indc-share" aria-controls="tabpanel-indc-share" aria-selected="true" tabindex="0">Share by industry</button>
-                <button type="button" class="tab-btn" role="tab" id="tab-indc-cross" aria-controls="tabpanel-indc-cross" aria-selected="false" tabindex="-1">By use type and work activity</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-indc-use" aria-controls="tabpanel-indc-use" aria-selected="false" tabindex="-1">Use type by industry</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-indc-gwa" aria-controls="tabpanel-indc-gwa" aria-selected="false" tabindex="-1">Work activities (GWA) by industry</button>
               </div>
               <div role="tabpanel" id="tabpanel-indc-share" aria-labelledby="tab-indc-share" style="display:block;">
-                <div id="c-indc" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Share of work-related conversations by industry. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <div id="c-indc" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Share of work-related consumer AI activity by industry. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
               </div>
-              <div role="tabpanel" id="tabpanel-indc-cross" aria-labelledby="tab-indc-cross" style="display:none;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Read across a row: what each industry's conversations are about. Choose a use type to filter, and switch the view to see where an industry does more of an activity than the average industry.</p>
+              <div role="tabpanel" id="tabpanel-indc-use" aria-labelledby="tab-indc-use" style="display:none;">
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">Each row shows how consumer AI activity in that industry divides among Work, Personal and Education use. The three use types sum to 100%; no work-activity breakdown is combined with this view.</p>
+                <div id="ict-use-box" style="overflow-x:auto;"></div>
+              </div>
+              <div role="tabpanel" id="tabpanel-indc-gwa" aria-labelledby="tab-indc-gwa" style="display:none;">
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 1rem;max-width:760px;">This view shows general work activities (GWAs) within each industry's work-related AI use. It is separate from the use-type breakdown above; use the selector only to compare shares with the average industry.</p>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
-                  <div style="display:flex;flex-direction:column;gap:0.35rem;min-width:13rem;"><label for="sel-ict-use" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">USE TYPE</label><select id="sel-ict-use" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"><option value="all">All use types</option><option value="Work">Work</option><option value="Personal">Personal</option><option value="Education">Education</option></select></div>
-                  <div style="display:flex;flex-direction:column;gap:0.35rem;min-width:18rem;"><label for="sel-ict-view" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">VIEW</label><select id="sel-ict-view" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"><option value="share">Share of the industry's conversations</option><option value="index">Compared with the average industry</option></select></div>
+                  <div style="display:flex;flex-direction:column;gap:0.35rem;min-width:18rem;"><label for="sel-ict-view" style="font-family:var(--font-display);font-weight:600;font-size:0.75rem;color:var(--gray-44);text-transform:uppercase;letter-spacing:1px;">WORK ACTIVITY VIEW</label><select id="sel-ict-view" style="border:1px solid var(--gray-91);border-radius:var(--radius-none);padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--gray-36);background:var(--gray-97);"><option value="share">Share of work-related AI use in industry</option><option value="index">Compared with the average industry</option></select></div>
                 </div>
                 <div id="ict-box" style="overflow-x:auto;"></div>
               </div>
               <div id="indc-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
-              <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data. Industry views cover work-related use only, and in the live Index cells may be suppressed where the sample is small.</p>
+              <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data. Industry by use type and industry by GWA are separate two-way views; the GWA view covers Work use only. The mock-up does not combine industry, use type and GWA in one cross-tab. A live Index may suppress cells below sample thresholds.</p>
             </div>
           </div>
         </div>
 
         <div role="tabpanel" id="tabpanel-api" aria-labelledby="tab-api" data-tab-panel="api" style="display:none;">
-          <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">From API token volumes reported by coalition firms, by country and industry. Illustrative data.</p>
+          <p style="font-size:0.9rem;color:var(--gray-36);margin:0 0 1rem;">API token volume is reported by participating firms and grouped by country and industry. Illustrative data.</p>
           <div style="display:flex;flex-wrap:wrap;gap:1.25rem;">
             <div style="flex:1 1 440px;" id="c-open" data-cc="1" data-title="Open-source vs proprietary model use" data-sub="Share of API tokens (%), by quarter" data-h="280"></div>
             <div style="flex:1 1 440px;" id="c-origin" data-cc="1" data-title="Region of origin of models used" data-sub="Share of API tokens (%), by quarter" data-h="280"></div>
@@ -269,21 +256,23 @@
                   <h3 style="font-size:1.15rem;color:var(--blue-12);margin:0;font-family:var(--font-display);">Industry</h3>
                   <p style="font-size:0.875rem;color:var(--gray-36);margin:0.15rem 0 0.75rem;max-width:760px;">Abbreviated classification: Agriculture, Industry, 8 Services. Share of API tokens (%).</p>
                 </div>
-                <button type="button" id="ind10-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);flex:none;">Table</button>
               </div>
               <div class="tab-bar" role="tablist" aria-label="Industry views" style="margin-bottom:1rem;">
-                <button type="button" class="tab-btn" role="tab" id="tab-ind10-trend" aria-controls="tabpanel-ind10-trend" aria-selected="true" tabindex="0">Trend over time</button>
-                <button type="button" class="tab-btn" role="tab" id="tab-ind10-latest" aria-controls="tabpanel-ind10-latest" aria-selected="false" tabindex="-1">Latest quarter</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-ind10-trend" aria-controls="tabpanel-ind10-trend" aria-selected="true" tabindex="0">Growth index</button>
+                <button type="button" class="tab-btn" role="tab" id="tab-ind10-latest" aria-controls="tabpanel-ind10-latest" aria-selected="false" tabindex="-1">Rank index: latest quarter</button>
               </div>
               <div role="tabpanel" id="tabpanel-ind10-trend" aria-labelledby="tab-ind10-trend" style="display:block;">
-                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.75rem;">One panel per industry. Each panel has its own scale starting at zero, so compare the direction of change here and use the Latest quarter tab to compare sizes.</p>
+                <p style="font-size:0.875rem;color:var(--gray-36);margin:0 0 0.75rem;">One panel per industry, indexed to its own 2025 Q1 share = 100. Use this view to compare change over time; the separate Rank index tab shows latest-quarter industry shares in descending order.</p>
+                <button type="button" id="ind10-growth-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);margin-bottom:0.75rem;">Table</button>
                 <div id="ind10-grid" class="ind-grid"></div>
+                <div id="ind10-growth-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
               </div>
               <div role="tabpanel" id="tabpanel-ind10-latest" aria-labelledby="tab-ind10-latest" style="display:none;">
-                <div id="c-ind10" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Share of API tokens by industry, latest quarter. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <button type="button" id="ind10-rank-table-btn" aria-expanded="false" style="min-height:0;padding:0.2rem 0.7rem;font-size:0.8125rem;border:1px solid var(--gray-91);border-radius:0;background:#fff;color:var(--blue-45);cursor:pointer;font-family:var(--font-body);margin-bottom:0.75rem;">Table</button>
+                <div id="c-ind10" style="position:relative;min-height:420px;"><canvas role="img" aria-label="Latest-quarter industry rank by share of API tokens. Use the Table button for the values." style="position:absolute;inset:0;width:100%;height:100%;"></canvas></div>
+                <div id="ind10-rank-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
               </div>
-              <div id="ind10-table" style="display:none;max-height:22rem;overflow:auto;margin-top:1rem;"></div>
-              <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data</p>
+              <p style="font-size:0.75rem;color:var(--gray-44);margin:0.75rem 0 0;">Illustrative data. Growth indices and latest-quarter ranks are separate views.</p>
             </div>
           </div>
         </div>
@@ -333,7 +322,7 @@ class Component extends DCLogic {
   renderVals() {
     return {
       rootRef: (el) => { this.rootEl = el; },
-      navItems: [{ label: 'World map', href: '#world-map' }, { label: 'Comparisons', href: '#comparisons' }, { label: 'Country indicators', href: '#country-indicators' }, { label: 'Stakeholder questions', href: 'questions.html' }]
+      navItems: [{ label: 'World map', href: '#world-map' }, { label: 'How to read the deciles', href: '#comparisons' }, { label: 'Country indicators', href: '#country-indicators' }, { label: 'Stakeholder questions', href: 'questions.html' }]
     };
   }
 }
