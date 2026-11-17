@@ -17,7 +17,7 @@ const NAVY = T.navy, ORANGE = T.orangeDark, TEAL = T.tealDark, PURPLE = T.purple
 const SERIES = [NAVY, ORANGE, TEAL, PURPLE];
 const RAMP = ['#dbe3f4', '#a9bbe3', '#6f8acb', '#34539f', NAVY];
 // Each core indicator has its own sequential ramp, so the map reads as a different measure at a glance:
-// Consumer activity diffusion = blue family, API usage volume = orange family (design-system tokens).
+// Consumer AI use = blue family, API token volume = orange family (design-system tokens).
 // Mock-profile countries are marked in near-black instead, which stays visible on both ramps.
 const HILITE = cssVar('--gray-7') || '#161616';
 const RAMPS = {
@@ -115,7 +115,7 @@ function tableHTML(cfg) {
   const d = cfg.data;
   if (cfg.type === 'scatter') {
     let rows = '';
-    d.datasets.filter(ds => ds.type !== 'line').forEach(ds => ds.data.forEach(p => { rows += `<tr><td style="${sTd}">${esc(p.name)}</td><td style="${sTdEnd}">${p.x}</td><td style="${sTdEnd}">${p.y}</td></tr>`; }));
+    d.datasets.filter(ds => ds.type !== 'line').forEach(ds => ds.data.forEach(p => { rows += `<tr><td style="${sTd}">${esc(p.name)}</td><td style="${sTdEnd}">${p.tx ?? p.x}</td><td style="${sTdEnd}">${p.ty ?? p.y}</td></tr>`; }));
     const hd = cfg.tableHeads || {};
     return `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Country</th><th style="${sThEnd}">${esc(hd.x || 'x')}</th><th style="${sThEnd}">${esc(hd.y || 'y')}</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
@@ -178,8 +178,8 @@ const NO_DATA = ['Taiwan','Kosovo','W. Sahara','Somaliland','N. Cyprus','Falklan
 const PROFILE = { 'Brazil': 'BR', 'Malawi': 'MW', 'United States of America': 'US' };
 const FIXED = { 'Brazil': 0.56, 'Malawi': 0.14, 'United States of America': 0.92 };
 
-const IND = { consumer: 'Consumer activity diffusion', api: 'API usage volume' };
-const NORM = { pop: 'per person', wap: 'per working-age person', gdp: 'per unit of GDP', gdppc: 'relative to GDP per capita' };
+const IND = { consumer: 'Consumer AI use', api: 'API token volume' };
+const NORM = { pop: 'per resident', wap: 'per working-age resident', gdp: 'per unit of gross domestic product', gdppc: 'relative to GDP per capita' };
 const KSLOPE = { pop: 3.0, wap: 2.9, gdp: 1.0, gdppc: 0.6 };
 const COR = [
   { id: 'internet', label: 'Population with access to the Internet', unit: '%', lo: 8, hi: 99, a: 0.85, sign: 1 },
@@ -189,7 +189,6 @@ const COR = [
   { id: 'elec', label: 'Electrification rate', unit: '%', lo: 12, hi: 100, a: 0.75, sign: 1 },
   { id: 'college', label: 'College graduates (adults)', unit: '%', lo: 1, hi: 50, a: 0.7, sign: 1 }
 ];
-
 const GWA = ['Getting information','Working with computers','Thinking creatively','Analyzing data or information','Documenting and recording information','Communicating with people outside the organization','Training and teaching others','Making decisions and solving problems','Interpreting the meaning of information for others','Providing consultation and advice to others'];
 const GWA_W = [13, 9, 12, 6, 12, 2, 3, 7, 3, 24];   // roughly Claude.ai shares (Anthropic Economic Index)
 const IWA = ['Write material for artistic or commercial purposes','Program computer systems or production equipment','Interpret language, cultural, or religious information for others','Prepare informational or instructional materials','Analyze data to improve operations','Edit written materials or documents','Explain technical details of products or services','Explain regulations, policies, or procedures','Develop marketing or promotional materials','Advise others on healthcare or wellness issues'];
@@ -212,13 +211,13 @@ const ICT_USE = {
   Personal: [1.3, 0.8, 1.5, 0.7, 0.6, 0.7, 0.8, 0.9, 0.9, 1.2],
   Education: [1.2, 0.6, 0.8, 0.6, 0.7, 0.5, 2.4, 0.7, 1.1, 1.5]
 };
-// mock: how much more of a intermediate work activity (IWA index) an occupational topic does than the average topic
-const OCC_AFF = { 'Management': { 4: 1.6, 8: 1.4, 5: 1.2 }, 'Science and engineering': { 1: 1.8, 4: 2.2, 6: 2.2 }, 'Health': { 9: 4, 6: 1.5 }, 'Teaching': { 3: 3.5, 6: 2.5 }, 'Business and administration': { 8: 2, 4: 1.8, 5: 1.6, 0: 1.3 }, 'Information and communications technology': { 1: 4.5, 4: 1.6, 6: 1.4 }, 'Legal': { 7: 6, 5: 1.8 }, 'Social science, counselling, and religion': { 9: 2.8, 6: 1.6, 4: 1.3 }, 'Writing, translation, and the arts': { 0: 3.2, 5: 2.8, 2: 3, 8: 1.5 }, 'Clerical support': { 5: 2.5, 0: 1.4, 2: 1.2 }, 'Service and sales': { 8: 2.6, 9: 1.3, 2: 1.2 } };
+// Mock occupational-topic affinities for broad general work activities (GWAs).
+const OCC_GWA_AFF = { 'Management': { 7: 1.6, 9: 1.5 }, 'Science and engineering': { 1: 1.8, 2: 1.5, 3: 2.2 }, 'Health': { 0: 1.3, 8: 1.5, 9: 1.8 }, 'Teaching': { 0: 1.3, 4: 1.3, 6: 2.5 }, 'Business and administration': { 3: 1.4, 4: 1.8, 7: 1.3 }, 'Information and communications technology': { 1: 4.5, 3: 1.6, 7: 1.4 }, 'Legal': { 4: 1.8, 7: 1.3, 8: 2.2 }, 'Social science, counselling, and religion': { 6: 1.6, 8: 1.3, 9: 2.0 }, 'Writing, translation, and the arts': { 2: 2.4, 4: 1.8, 8: 1.4 }, 'Clerical support': { 0: 1.4, 4: 2.0, 5: 1.2 }, 'Service and sales': { 0: 1.3, 5: 1.8, 9: 1.3 } };
 const USE_NAMES = ['Work', 'Personal', 'Education'];
 const USE_COL = [NAVY, RAMP[2], RAMP[1]];
-function occIwa(key, c, topic) {
-  const raw = IWA.map((nm, i) => IWA_W[i] * ((OCC_AFF[topic] || {})[i] || 1) * (c.tilt[nm] || 1) * (0.85 + 0.3 * h(key + topic + i)));
-  const s = raw.reduce((a, b) => a + b, 0); return raw.map(v => 100 * v / s);
+function occGwa(key, c, topic) {
+  const raw = GWA.map((name, i) => GWA_W[i] * ((OCC_GWA_AFF[topic] || {})[i] || 1) * (c.tilt[name] || 1) * (0.85 + 0.3 * h(key + topic + i)));
+  return to100(raw);
 }
 // table blocks that follow the selected tab of a card
 function tblBlock(root, hostSel, name, html) {
@@ -265,11 +264,11 @@ const C = {
     sample: 'Sample: about 400,000 classified conversations this quarter (100,000 per firm, four firms; tier 1). All cross-tabs are available.',
     use: [44, 34, 22], langs: [['Portuguese', 86], ['English', 10], ['Spanish', 3], ['Other', 1]],
     peaks: [[15, 1], [21, 0.8]], tilt: { 'Write material for artistic or commercial purposes': 1.25, 'Business and administration': 1.2, 'Writing, translation, and the arts': 1.3, 'L Financial and insurance': 1.5, 'Financial and insurance activities': 1.6, 'Agriculture, forestry and fishing': 1.6, 'A Agriculture, forestry, fishing': 1.6 },
-    ct: [true, true, true], open: [31, 38], origin: [71, 17, 8, 4],
+    ct: [true, true, true, true], open: [31, 38], origin: [71, 17, 8, 4],
     lfpr: [61.9, 62.4], adopt: [[9, 19], [12, 22]], skills: [62, 48, 51, 44, 38, 47], eduAtt: [58, 22, 3], eduUse: [17, 22],
     opps: [['AI engineer', 84], ['AI trainer and data annotator', 61], ['Conversation designer', 47], ['ML operations engineer', 39], ['AI compliance analyst', 33]],
     insights: [
-      ['Finance leads API use; manufacturing lags', 'Finance and insurance account for the largest share of API tokens, about twice the share of all industry combined. Manufacturing is 7% of work-related consumer use but under-represented in API activity.', 'Adoption support for manufacturing SMEs (shared tooling, vouchers) would target the gap rather than sectors already moving.'],
+      ['Finance leads API use; manufacturing lags', 'Finance and insurance account for the largest share of API tokens, about twice the share of all industry combined. Manufacturing is 7% of work-related consumer AI activity but under-represented in API activity.', 'Adoption support for manufacturing SMEs (shared tooling, vouchers) would target the gap rather than sectors already moving.'],
       ['Portuguese dominates, so local-language quality matters', '86% of queries are in Portuguese. Use is concentrated in writing and business topics where language quality drives usefulness.', 'Public procurement and evaluation standards should test Portuguese performance directly, not rely on English benchmarks.'],
       ['Open-source share is rising', 'Open-source models went from 31% to 38% of API tokens over seven quarters.', 'Compute access and hosting rules will increasingly shape who can build; review data-residency and cloud-credit policy with that in mind.'],
       ['Work use is catching up with personal use', 'Monthly work use roughly doubled to 19% of the working-age population, still behind personal use at 22%.', 'Workforce programmes can build on skills people already have from personal use; prioritise sectors where work use is lowest.']
@@ -277,14 +276,14 @@ const C = {
   },
   MW: {
     name: 'Malawi', index: [6.1, 12.4], rank: 151, lang: 'English', lang2: 'Chichewa is second, at about 22%',
-    sample: 'Sample: Malawi is pooled each quarter with six Eastern African neighbours (about 80,000 classified conversations for the group: 20,000 per firm, four firms). Country figures shown are annual where firms’ volumes allow. Two of three cross-tabs are suppressed for statistical disclosure control, and API estimates carry wide uncertainty.',
+    sample: 'Sample: Malawi is pooled each quarter with six Eastern African neighbours (about 80,000 classified conversations for the group: 20,000 per firm, four firms). Country figures shown are annual where firms’ volumes allow. In this mock, the industry-by-use breakdown is suppressed while broader GWA views are shown; live availability depends on sample thresholds. API estimates carry wide uncertainty.',
     use: [28, 27, 45], langs: [['English', 71], ['Chichewa', 22], ['Chitumbuka', 3], ['Other', 4]],
     peaks: [[20, 1], [13, 0.45]], tilt: { 'Training and teaching others': 1.8, 'Getting information': 1.3, 'Teaching': 2.2, 'Skilled agricultural, forestry, and fishery': 3, 'Information and communications technology': 0.5, 'Explain technical details of products or services': 1.7, 'Prepare informational or instructional materials': 1.5, 'Interpret language, cultural, or religious information for others': 1.5, 'Program computer systems or production equipment': 0.5, 'Q Education': 2.2, 'A Agriculture, forestry, fishing': 3.5, 'K Telecoms, computing, information services': 0.6, 'Agriculture, forestry and fishing': 3, 'Education': 2.2, 'Public administration': 1.6, 'Human health and social work': 1.5 },
-    ct: [true, false, false], open: [55, 62], origin: [58, 29, 7, 6],
+    ct: [true, false, true, true], open: [55, 62], origin: [58, 29, 7, 6],
     lfpr: [72.6, 73.1], adopt: [[0.8, 2.6], [1.0, 3.1]], skills: [34, 12, 15, 9, 14, 11], eduAtt: [14, 3, 0.5], eduUse: [38, 45],
     opps: [['Local-language data annotator', 72], ['Digital agriculture advisor', 54], ['EdTech content developer', 41], ['Mobile money data analyst', 36], ['AI support officer (NGO programmes)', 28]],
     insights: [
-      ['Education is the main use', '45% of sampled conversations are for education, the highest of the three use types, and teaching-related activities lead work use.', 'Teacher training and curriculum guidance on AI would reach the largest existing user group; start there before broader workforce programmes.'],
+      ['Education is the main use', '45% of sampled consumer AI activity is for education, the highest of the three use types, and teaching-related activities lead work use.', 'Teacher training and curriculum guidance on AI would reach the largest existing user group; start there before broader workforce programmes.'],
       ['Chichewa use is substantial despite weak model support', 'About one in five queries is in Chichewa, a low-resource language where model quality is lower.', 'Investment in Chichewa text and speech data (for example through a national language data trust) would improve usefulness for most of the population.'],
       ['Use peaks in the evening', 'Use peaks around 20:00, outside working hours, consistent with personal devices and off-peak data bundles rather than workplace access.', 'Connectivity cost and workplace device access are likely binding constraints; consider zero-rating education uses.'],
       ['Open-source models carry most API use, on a small base', 'Open-source models account for an estimated 62% of API tokens, but the sample is small and the estimate uncertain.', 'Treat API figures as indicative. Shared regional compute may matter more than national infrastructure at this scale.']
@@ -295,7 +294,7 @@ const C = {
     sample: 'Sample: about 400,000 classified conversations this quarter (100,000 per firm, four firms; tier 1). All cross-tabs are available. State-level figures are published in the US sub-national index.',
     use: [52, 33, 15], langs: [['English', 88], ['Spanish', 8], ['Chinese', 1.5], ['Other', 2.5]],
     peaks: [[11, 1], [14, 0.95], [21, 0.5]], tilt: { 'Working with computers': 1.5, 'Analyzing data or information': 1.3, 'Information and communications technology': 1.6, 'Science and engineering': 1.3, 'Program computer systems or production equipment': 1.6, 'K Telecoms, computing, information services': 1.4, 'N Professional, scientific, technical': 1.2, 'Information and communication': 1.3 },
-    ct: [true, true, true], open: [18, 22], origin: [89, 6, 4, 1],
+    ct: [true, true, true, true], open: [18, 22], origin: [89, 6, 4, 1],
     lfpr: [62.5, 62.6], adopt: [[21, 38], [24, 41]], skills: [81, 77, 72, 70, 58, 79], eduAtt: [91, 38, 14], eduUse: [13, 15],
     opps: [['AI engineer', 68], ['Agent orchestration engineer', 63], ['AI governance lead', 44], ['Forward-deployed engineer', 41], ['AI trainer (domain expert)', 35]],
     insights: [
@@ -349,6 +348,51 @@ function indValue(n, ind, norm) {
   const k = KSLOPE[norm] * (ind === 'api' ? 1.25 : 1);
   return Math.max(1, Math.round(100 * Math.exp(k * (score(n) - 0.5)) * (0.8 + 0.4 * h(n + ind + norm))));
 }
+function metricValues(norm) {
+  const v = { consumer: {}, api: {} };
+  countries.forEach(n => { v.consumer[n] = indValue(n, 'consumer', norm); v.api[n] = indValue(n, 'api', norm); });
+  return v;
+}
+function indicatorDeciles(values) {
+  const scale = d3.scaleQuantile().domain(Object.values(values)).range(d3.range(1, 11));
+  return Object.fromEntries(Object.entries(values).map(([country, value]) => [country, scale(value)]));
+}
+
+function renderMap(root) {
+  const ind = root.querySelector('#sel-ind').value, norm = root.querySelector('#sel-norm').value;
+  const both = metricValues(norm), values = both[ind], ramp = RAMPS[ind];
+  const deciles = { consumer: indicatorDeciles(both.consumer), api: indicatorDeciles(both.api) };
+  mapState = { ind, norm, deciles };
+  const colors = d3.range(10).map(i => d3.interpolateRgb(ramp[0], ramp[ramp.length - 1])(i / 9));
+  const scale = d3.scaleOrdinal().domain(d3.range(1, 11)).range(colors);
+  paths.attr('fill', d => deciles[ind][d.properties.name] == null ? NODATA : scale(deciles[ind][d.properties.name]));
+  root.querySelector('#map-title').textContent = ind === 'consumer' ? `${IND[ind]} (based on monthly active users) ${NORM[norm]}` : `${IND[ind]} ${NORM[norm]}`;
+  const chip = c => `<span style="display:inline-block;width:1rem;height:1rem;border-radius:0;margin-right:0.25rem;vertical-align:-2px;border:1px solid rgba(0,0,0,.15);background:${c}"></span>`;
+  root.querySelector('#map-legend').innerHTML = colors.map((c, i) =>
+    `<span>${chip(c)}Decile ${i + 1}${i === 0 ? ' (lowest)' : i === 9 ? ' (highest)' : ''}</span>`).join('') +
+    `<span>${chip(NODATA)}No data</span>`;
+
+  // Side scatter: API token volume decile against Consumer AI use decile, coloured as on the map.
+  // Countries sharing a decile pair are spread slightly within the cell; the table and tooltip keep the exact deciles.
+  const jit = s => (h(s) - 0.5) * 0.6;
+  const pts = countries.map(n => ({ tx: deciles.consumer[n], ty: deciles.api[n], x: deciles.consumer[n] + jit(n + 'x'), y: deciles.api[n] + jit(n + 'y'), name: n }));
+  const fit = fitLinear(pts.map(p => ({ x: p.tx, y: p.ty })));
+  setHead('c-scatter', `${IND.api} and ${IND.consumer} deciles`,
+    `Each dot is a country, coloured as on the map. Dots are spread slightly within each decile cell. Linear fit on deciles: R² = ${fmt2(fit.r2)}, r = ${fmt2(fit.r)}, n = ${pts.length}.`);
+  const scEl = document.getElementById('c-scatter');
+  scEl.querySelector('h3').style.fontSize = '1rem';
+  scEl.querySelector('h3').style.lineHeight = '1.3';
+  scEl.querySelector('.card-sub').style.fontSize = '0.8125rem';
+  decileScatter('c-scatter', {
+    pts, fit, xDecile: true,
+    dotColors: p => scale(deciles[ind][p.name]), dotBorder: ramp[ramp.length - 1] + 'AA',
+    color: MCOL.api, xColor: MCOL.consumer,
+    xTitle: `${IND.consumer} (decile)`, yTitle: `${IND.api} (decile)`,
+    heads: { x: `${IND.consumer} decile`, y: `${IND.api} decile` },
+    tip: c => ` ${c.raw.name}: consumer decile ${c.raw.tx}, API decile ${c.raw.ty}`
+  });
+}
+
 function corValue(n, c) {
   let t = c.a * (score(n) - 0.05) / 0.9 + (1 - c.a) * h(n + c.id);
   t = Math.min(1, Math.max(0, t));
@@ -372,16 +416,14 @@ const labelPlugin = {
   }
 };
 
-// Least-squares fit of ln(y) on x (or on ln(x) when the x axis is logarithmic).
-// R² and r are therefore on the log of the indicator, which is how the axes are drawn.
-function fitLog(pts, logX) {
-  const xs = pts.map(p => logX ? Math.log(p.x) : p.x), ys = pts.map(p => Math.log(p.y));
+// Least-squares fit of the decile (y) on the comparator (x)
+function fitLinear(pts) {
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
   const mx = d3.mean(xs), my = d3.mean(ys);
   const sxx = d3.sum(xs, v => (v - mx) ** 2), syy = d3.sum(ys, v => (v - my) ** 2), sxy = d3.sum(xs, (v, i) => (v - mx) * (ys[i] - my));
   const b = sxy / sxx, a = my - b * mx, r = sxy / Math.sqrt(sxx * syy);
-  const x0 = d3.min(pts, p => p.x), x1 = d3.max(pts, p => p.x);
-  const f = x => Math.exp(a + b * (logX ? Math.log(x) : x));
-  return { r, r2: r * r, n: pts.length, line: [{ x: x0, y: f(x0) }, { x: x1, y: f(x1) }] };
+  const x0 = d3.min(xs), x1 = d3.max(xs);
+  return { r, r2: r * r, n: pts.length, line: [{ x: x0, y: a + b * x0 }, { x: x1, y: a + b * x1 }] };
 }
 const fmt2 = v => (Math.round(v * 100) / 100).toFixed(2).replace('-', '\u2212');
 
@@ -400,18 +442,18 @@ const r2Plugin = {
     ctx.restore();
   }
 };
-const logTicks = v => { const m = v / Math.pow(10, Math.floor(Math.log10(v))); return (Math.abs(m - 1) < 1e-9 || Math.abs(m - 3) < 1e-9) ? v : ''; };
 
-// Correlation scatter with a fitted trend line and R². o: { pts, fit, dotColors, dotBorder, xTitle, yTitle, xColor, yColor,
-// xLog, xUnit, tip, heads }. Mock-profile countries are drawn as labelled dark diamonds, as on the map.
-function corrScatter(id, o) {
+const decileAxis = (text, color) => ({ min: 0.5, max: 10.5, afterBuildTicks: ax => { ax.ticks = d3.range(1, 11).map(value => ({ value })); }, ticks: { callback: v => Number.isInteger(v) ? v : '' }, title: { display: true, text, color, font: { size: 12, weight: '600' } } });
+
+// Decile scatter with a fitted trend line and R². Mock-profile countries are drawn as labelled dark diamonds, as on the map.
+function decileScatter(id, o) {
   const prof = o.pts.filter(p => PROFILE[p.name]).map(p => Object.assign({ short: p.name === 'United States of America' ? 'United States' : p.name }, p));
   const rest = o.pts.filter(p => !PROFILE[p.name]);
   draw(id, {
     type: 'scatter',
     tableHeads: o.heads,
     data: { datasets: [
-      { label: 'Countries', data: rest, order: 1, backgroundColor: rest.map(p => o.dotColors(p)), borderColor: o.dotBorder, borderWidth: 1, pointRadius: 4.5, pointHoverRadius: 6.5 },
+      { label: 'Countries', data: rest, order: 1, backgroundColor: o.dotColors ? rest.map(o.dotColors) : o.color + 'B3', borderColor: o.dotBorder || '#fff', borderWidth: 1, pointRadius: 4.5, pointHoverRadius: 6.5 },
       { label: 'Mock profiles', data: prof, order: 0, backgroundColor: HILITE, borderColor: '#fff', borderWidth: 2, pointRadius: 7, pointHoverRadius: 9, pointStyle: 'rectRot' },
       { type: 'line', label: 'Trend line', data: o.fit.line, order: 2, borderColor: INK, borderWidth: 2, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 0, fill: false, tension: 0 }
     ] },
@@ -419,77 +461,36 @@ function corrScatter(id, o) {
       plugins: {
         legend: { display: false },
         tooltip: { filter: it => it.dataset.type !== 'line', callbacks: { label: o.tip } },
-        r2Label: { text: `R² = ${fmt2(o.fit.r2)}`, corner: o.fit.r < 0 ? 'tr' : 'tl', color: o.yColor }
+        r2Label: { text: `R² = ${fmt2(o.fit.r2)}`, corner: o.fit.r < 0 ? 'tr' : 'tl', color: o.color }
       },
       scales: {
-        x: Object.assign({ title: { display: true, text: o.xTitle, color: o.xColor, font: { size: 12, weight: '600' } } }, o.xLog ? { type: 'logarithmic', ticks: { callback: logTicks, autoSkip: false, maxRotation: 0 } } : {}),
-        y: { type: 'logarithmic', ticks: { callback: logTicks }, title: { display: true, text: o.yTitle, color: o.yColor, font: { size: 12, weight: '600' } } }
+        x: o.xDecile ? decileAxis(o.xTitle, o.xColor) : { title: { display: true, text: o.xTitle, color: INK, font: { size: 12, weight: '600' } } },
+        y: decileAxis(o.yTitle, o.color)
       }
     },
     plugins: [labelPlugin, r2Plugin]
   });
 }
 
-// Both core indicators for every country, under the chosen normalization
-function metricValues(norm) {
-  const v = { consumer: {}, api: {} };
-  countries.forEach(n => { v.consumer[n] = indValue(n, 'consumer', norm); v.api[n] = indValue(n, 'api', norm); });
-  return v;
-}
-const darker = c => c + 'AA';   // ramp's darkest step, semi-opaque, as a dot outline
-
-function renderMap(root) {
-  const ind = root.querySelector('#sel-ind').value, norm = root.querySelector('#sel-norm').value;
-  const both = metricValues(norm), values = both[ind], ramp = RAMPS[ind];
-  mapState = { ind, norm, values, vc: both.consumer, va: both.api };
-  const scale = d3.scaleQuantile(Object.values(values), ramp);
-  paths.attr('fill', d => values[d.properties.name] == null ? NODATA : scale(values[d.properties.name]));
-  root.querySelector('#map-title').textContent = ind === 'consumer' ? `${IND[ind]} (based on Monthly Active Users) ${NORM[norm]}` : `${IND[ind]} ${NORM[norm]}`;
-  const q = scale.quantiles().map(Math.round), b = [null].concat(q);
-  const chip = c => `<span style="display:inline-block;width:1rem;height:1rem;border-radius:0;margin-right:0.25rem;vertical-align:-2px;border:1px solid rgba(0,0,0,.15);background:${c}"></span>`;
-  root.querySelector('#map-legend').innerHTML = ramp.map((c, i) =>
-    `<span>${chip(c)}${i === 0 ? 'under ' + q[0] : i === ramp.length - 1 ? q[i - 1] + ' and over' : b[i] + ' to ' + (q[i] - 1)}</span>`).join('') +
-    `<span>${chip(NODATA)}No data</span>`;
-
-  // Side scatter: API usage volume against Consumer activity diffusion. Dots take the colour the country has on the map.
-  const pts = countries.map(n => ({ x: both.consumer[n], y: both.api[n], name: n }));
-  const fit = fitLog(pts, true);
-  setHead('c-scatter', `${IND.api} and ${IND.consumer.toLowerCase()}`,
-    `Each dot is a country, coloured as on the map. Log-log fit: R² = ${fmt2(fit.r2)}, r = ${fmt2(fit.r)}, n = ${pts.length}.`);
-  const scEl = document.getElementById('c-scatter');
-  scEl.querySelector('h3').style.fontSize = '1rem';
-  scEl.querySelector('h3').style.lineHeight = '1.3';
-  scEl.querySelector('.card-sub').style.fontSize = '0.8125rem';
-  corrScatter('c-scatter', {
-    pts, fit, xLog: true,
-    dotColors: p => scale(values[p.name]), dotBorder: darker(ramp[4]),
-    xTitle: `${IND.consumer} (world median = 100)`, yTitle: `${IND.api} (world median = 100)`,
-    xColor: MCOL.consumer, yColor: MCOL.api,
-    heads: { x: IND.consumer, y: IND.api },
-    tip: c => ` ${c.raw.name}: consumer ${c.raw.x}, API ${c.raw.y}`
-  });
-}
-
-// Comparisons: each core indicator against the chosen comparator, as two correlation scatters
+// Comparisons: each core indicator's decile against the chosen comparator
 let cmpState = {};
 function renderComparisons(root) {
   const norm = root.querySelector('#sel-norm-cmp').value, cor = COR.find(c => c.id === root.querySelector('#sel-cor').value);
   const both = metricValues(norm);
-  cmpState = { norm, cor, vc: both.consumer, va: both.api, fits: {} };
+  const deciles = { consumer: indicatorDeciles(both.consumer), api: indicatorDeciles(both.api) };
+  cmpState = { norm, cor, deciles, fits: {} };
   const xTitle = cor.label + (cor.unit ? ' (' + cor.unit + ')' : '');
   ['consumer', 'api'].forEach(k => {
-    const pts = countries.map(n => ({ x: corValue(n, cor), y: both[k][n], name: n }));
-    const fit = fitLog(pts, false);
+    const pts = countries.map(n => ({ x: corValue(n, cor), y: deciles[k][n], name: n }));
+    const fit = fitLinear(pts);
     cmpState.fits[k] = fit;
-    setHead('c-cmp-' + k, `${IND[k]} and ${cor.label.toLowerCase()}`,
-      `Each dot is a country. Log-linear fit: R² = ${fmt2(fit.r2)}, r = ${fmt2(fit.r)}, n = ${pts.length}. ${IND[k]} ${NORM[norm]}, world median = 100.`);
-    corrScatter('c-cmp-' + k, {
-      pts, fit, xLog: false,
-      dotColors: () => MCOL[k] + 'B3', dotBorder: '#fff',
-      xTitle, yTitle: `${IND[k]} (world median = 100)`,
-      xColor: INK, yColor: MCOL[k],
-      heads: { x: cor.label, y: IND[k] },
-      tip: c => ` ${c.raw.name}: ${c.raw.x}${cor.unit}, ${c.raw.y}`
+    setHead('c-cmp-' + k, `${IND[k]} decile and ${cor.label.toLowerCase()}`,
+      `Each dot is a country. Linear fit on deciles: R² = ${fmt2(fit.r2)}, r = ${fmt2(fit.r)}, n = ${pts.length}. ${IND[k]} ${NORM[norm]}; decile 1 is the lowest group and decile 10 the highest.`);
+    decileScatter('c-cmp-' + k, {
+      pts, fit, color: MCOL[k],
+      xTitle, yTitle: `${IND[k]} (decile)`,
+      heads: { x: cor.label, y: `${IND[k]} decile` },
+      tip: c => ` ${c.raw.name}: ${c.raw.x}${cor.unit}, decile ${c.raw.y}`
     });
   });
 }
@@ -501,7 +502,7 @@ function renderBenchmark(root, code, c, q) {
   const kinds = { consumer: { id: 'c-bench-consumer', color: MCOL.consumer, light: RAMP[2] }, api: { id: 'c-bench-api', color: RAMPS.api[3], light: RAMPS.api[2] } };
   Object.keys(kinds).forEach(k => {
     const o = kinds[k];
-    setHead(o.id, IND[k], ind ? `${indName}. Index, world all-industry level in 2025 Q1 = 100` : 'All industries. Index, world in 2025 Q1 = 100');
+    setHead(o.id, `${IND[k]} growth index`, ind ? `${indName}. 2025 Q1 = 100` : 'All industries. 2025 Q1 = 100');
     const mk = (label, who, style) => Object.assign({ label, data: benchSeries(k, who, ind).slice(0, q + 1), pointRadius: 4, pointHoverRadius: 6, tension: 0.2 }, style);
     draw(o.id, {
       type: 'line',
@@ -513,7 +514,7 @@ function renderBenchmark(root, code, c, q) {
       options: {
         interaction: { mode: 'index', intersect: false },
         plugins: { legend: { labels: { usePointStyle: true } }, tooltip: { callbacks: { label: x => ` ${x.dataset.label}: ${x.parsed.y}` } } },
-        scales: { y: { beginAtZero: true, title: { display: true, text: 'Index (world, 2025 Q1 = 100)', font: { size: 11 } }, ticks: { maxTicksLimit: 7 } }, x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 12 } } }
+        scales: { y: { beginAtZero: true, title: { display: true, text: 'Growth index (2025 Q1 = 100)', font: { size: 11 } }, ticks: { maxTicksLimit: 7 } }, x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 12 } } }
       }
     });
   });
@@ -591,7 +592,7 @@ function waDetail(root) {
   el.innerHTML = `<div style="border-left:6px solid ${d.color};padding:0.125rem 0 0.25rem 1.25rem;">
     <div style="font-size:0.8125rem;color:${T.gray600};">All work activities / <strong style="color:${T.gray800};">${esc(d.name)}</strong></div>
     <h4 style="font-family:var(--font-display);font-size:1.25rem;font-weight:600;color:${NAVY};margin:0.25rem 0 0;">${esc(d.name)}</h4>
-    <p style="font-size:0.875rem;color:${T.gray600};margin:0.25rem 0 0.75rem;">${(n => n === 1 ? 'One intermediate work activity (IWA)' : n + ' intermediate work activities (IWAs)')(d.iwas.filter(x => !x.other).length)} under this work activity can be reported for each country every quarter; rarer ones are published half-yearly, annually or by region. Together the work activity makes up ${d.share}% of conversations.</p>
+    <p style="font-size:0.875rem;color:${T.gray600};margin:0.25rem 0 0.75rem;">${(n => n === 1 ? 'One intermediate work activity (IWA)' : n + ' intermediate work activities (IWAs)')(d.iwas.filter(x => !x.other).length)} under this work activity can be reported for each country every quarter; rarer ones are published half-yearly, annually or by region. Together the work activity makes up ${d.share}% of consumer AI activity.</p>
     ${d.iwas.map(x => `<div class="wa-row"><div class="wa-row-label">${esc(x.name)}</div>
       <div class="wa-row-track"><div style="height:100%;width:${(100 * x.value / max).toFixed(1)}%;background:${MCOL.consumer};"></div></div>
       <div class="wa-row-val"><strong>${x.value}%</strong> <span style="color:${T.gray600};">${Math.round(100 * x.value / d.share)}% of this activity</span></div></div>`).join('')}
@@ -606,7 +607,7 @@ function renderWorkActivities(root, key, c) {
   const all = waData.flatMap(d => d.iwas.filter(x => !x.other).map(x => Object.assign({ gwa: d.name }, x))).sort((a, b) => b.value - a.value);
   const top = all.slice(0, 10);
   hbar('c-iwa', top.map(x => x.name), top.map(x => x.value), { wrap: 46, max: Math.ceil(top[0].value / 2) * 2 });
-  tblBlock(root, '#wa-table', 'tree', `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Work activity (GWA)</th><th style="${sTh}">Intermediate work activity (IWA)</th><th style="${sThEnd}">% of work-related conversations</th></tr></thead><tbody>` +
+  tblBlock(root, '#wa-table', 'tree', `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Work activity (GWA)</th><th style="${sTh}">Intermediate work activity (IWA)</th><th style="${sThEnd}">% of work-related consumer AI activity</th></tr></thead><tbody>` +
     waData.map(d => `<tr><td style="${sTd}font-weight:600;color:${T.gray800};">${esc(d.name)}</td><td style="${sTd}"></td><td style="${sTdEnd}font-weight:600;">${d.share}</td></tr>` +
       d.iwas.map(x => `<tr><td style="${sTd}"></td><td style="${sTd}">${esc(x.name)}</td><td style="${sTdEnd}">${x.value}</td></tr>`).join('')).join('') + '</tbody></table>');
   renderUseByGwa(root, key, c);
@@ -639,32 +640,35 @@ function renderUseByGwa(root, key, c) {
     ord.map((d, i) => `<tr><td style="${sTd}">${esc(d.name)}</td>${split[i].map(v => `<td style="${sTdEnd}">${v}</td>`).join('')}</tr>`).join('') + '</tbody></table>');
 }
 
-// ---------- Industry (API): small-multiple trend lines + latest-quarter ranking ----------
+// ---------- Industry (API): growth index and latest-quarter rank index ----------
 function renderIndustryTrends(root, series, q) {
   const QL = QUARTERS.slice(0, q + 1), grid = root.querySelector('#ind10-grid');
   IND10.forEach((_, i) => { const id = 'ind10-p' + i; if (charts[id]) { charts[id].destroy(); delete charts[id]; } });
   const signed = d => (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1);
-  const col = IND10.map((_, i) => series.slice(0, q + 1).map(r => r[i]));
+  const col = IND10.map((_, i) => series.slice(0, q + 1).map(r => r1(100 * r[i] / series[0][i])));
   grid.innerHTML = IND10.map((name, i) => {
-    const vals = col[i], now = vals[q], d = q > 0 ? r1(now - vals[0]) : null;
-    const dTxt = d == null ? 'First quarter in the series' : `${signed(d)} pp since ${QL[0]}`;
-    const lbl = `${name}: ${now.toFixed(1)}% of API tokens in ${QL[q]}` + (d == null ? '' : `, ${signed(d)} percentage points since ${QL[0]}`);
-    return `<div class="ind-panel" role="group" aria-label="${esc(lbl)}"><div class="ind-name">${esc(name)}</div><div class="ind-val"><strong>${now.toFixed(1)}%</strong><span>${dTxt}</span></div><div id="ind10-p${i}" class="ind-cv"><canvas role="img" aria-label="Line chart: ${esc(lbl)}" style="position:absolute;inset:0;"></canvas></div></div>`;
+    const vals = col[i], now = vals[q], d = q > 0 ? r1(now - 100) : null;
+    const dTxt = d == null ? 'Base quarter' : `${signed(d)}% since ${QL[0]}`;
+    const lbl = `${name}: growth index ${now.toFixed(1)} in ${QL[q]}` + (d == null ? '' : `, ${signed(d)}% since ${QL[0]}`);
+    return `<div class="ind-panel" role="group" aria-label="${esc(lbl)}"><div class="ind-name">${esc(name)}</div><div class="ind-val"><strong>${now.toFixed(1)}</strong><span>${dTxt}</span></div><div id="ind10-p${i}" class="ind-cv"><canvas role="img" aria-label="Growth index line chart: ${esc(lbl)}" style="position:absolute;inset:0;"></canvas></div></div>`;
   }).join('');
   IND10.forEach((name, i) => draw('ind10-p' + i, {
     type: 'line',
     data: { labels: QL, datasets: [{ label: name, data: col[i], borderColor: MCOL.api, backgroundColor: MCOL.api, borderWidth: 2, tension: 0.25, pointRadius: c => c.dataIndex === q ? 4 : 0, pointHoverRadius: 5 }] },
     options: {
-      plugins: { legend: { display: false }, tooltip: { callbacks: { title: t => t[0].label, label: c => ` ${c.parsed.y}% of API tokens` } } },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { title: t => t[0].label, label: c => ` Growth index: ${c.parsed.y.toFixed(1)} (2025 Q1 = 100)` } } },
       scales: {
-        y: { beginAtZero: true, grace: '10%', ticks: { maxTicksLimit: 3, callback: pct, font: { size: 11 } } },
+        y: { beginAtZero: true, grace: '10%', title: { display: true, text: 'Growth index (2025 Q1 = 100)', font: { size: 10 } }, ticks: { maxTicksLimit: 3, font: { size: 11 } } },
         x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 0, font: { size: 11 }, callback: function (v, j, t) { return (j === 0 || j === t.length - 1) ? this.getLabelForValue(v) : ''; } } }
       }
     }
   }));
-  hbar('c-ind10', IND10, series[q], { wrap: 46, colors: IND10.map(() => MCOL.api) });
-  root.querySelector('#ind10-table').innerHTML = `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Industry (share of API tokens, %)</th>${QL.map(l => `<th style="${sThEnd}">${l}</th>`).join('')}</tr></thead><tbody>` +
-    IND10.map((name, i) => `<tr><td style="${sTd}">${esc(name)}</td>${col[i].map(v => `<td style="${sTdEnd}">${v}</td>`).join('')}</tr>`).join('') + '</tbody></table>';
+  root.querySelector('#ind10-growth-table').innerHTML = `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Industry (growth index, 2025 Q1 = 100)</th>${QL.map(l => `<th style="${sThEnd}">${l}</th>`).join('')}</tr></thead><tbody>` +
+    IND10.map((name, i) => `<tr><td style="${sTd}">${esc(name)}</td>${col[i].map(v => `<td style="${sTdEnd}">${v.toFixed(1)}</td>`).join('')}</tr>`).join('') + '</tbody></table>';
+  const [rankLabels, rankValues] = sortDesc(IND10, series[q]);
+  hbar('c-ind10', rankLabels, rankValues, { wrap: 46, colors: rankLabels.map(() => MCOL.api) });
+  root.querySelector('#ind10-rank-table').innerHTML = `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Rank</th><th style="${sTh}">Industry</th><th style="${sThEnd}">Share of API tokens (%)</th></tr></thead><tbody>` +
+    rankLabels.map((name, i) => `<tr><td style="${sTd}">${i + 1}</td><td style="${sTd}">${esc(name)}</td><td style="${sTdEnd}">${rankValues[i]}</td></tr>`).join('') + '</tbody></table>';
 }
 
 // ---------- Occupational topics: share bars + proficiency squares ----------
@@ -689,14 +693,14 @@ function renderOccupations(root, code, topicShare) {
   const top = tls.slice(0, 10).sort((a, b) => prof[b].v[2] - prof[a].v[2]);
   const key = (nm, c) => `<span><span class="occ-key" style="background:${PROF_COL[nm]};border:1px solid ${RAMP[2]};"></span>${nm}</span>`;
   root.querySelector('#occ-prof').innerHTML =
-    `<div class="occ-legend">${key('Low')}${key('Medium')}${key('High')}<span><span class="occ-key" style="background:${GRAY_KEY};"></span>= 5% of the topic's conversations</span></div>` +
+    `<div class="occ-legend">${key('Low')}${key('Medium')}${key('High')}<span><span class="occ-key" style="background:${GRAY_KEY};"></span>= 5% of the topic's consumer AI activity</span></div>` +
     `<div role="list" aria-label="Occupational topics by proficiency, highest share of high proficiency first">` +
     top.map(t => {
       const { v, n } = prof[t], sq = ['Low', 'Medium', 'High'].map((nm, i) => Array(n[i]).fill(`<b style="background:${PROF_COL[nm]};border:1px solid ${RAMP[2]};"></b>`).join('')).join('');
       const lbl = `${t}: ${v[2]}% high, ${v[1]}% medium, ${v[0]}% low proficiency`;
       return `<div class="occ-row" role="listitem" aria-label="${esc(lbl)}"><span class="occ-name">${esc(t)}</span><span class="occ-sq" aria-hidden="true">${sq}</span><span class="occ-val"><strong>${v[2]}%</strong> High</span></div>`;
     }).join('') + '</div>';
-  tblBlock(root, '#occ-table', 'topics', `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Occupational topic</th><th style="${sTh}">ISCO-08</th><th style="${sThEnd}">Share of conversations (%)</th><th style="${sThEnd}">Low (%)</th><th style="${sThEnd}">Medium (%)</th><th style="${sThEnd}">High (%)</th></tr></thead><tbody>` +
+  tblBlock(root, '#occ-table', 'topics', `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Occupational topic</th><th style="${sTh}">ISCO-08</th><th style="${sThEnd}">Share of consumer AI activity (%)</th><th style="${sThEnd}">Low (%)</th><th style="${sThEnd}">Medium (%)</th><th style="${sThEnd}">High (%)</th></tr></thead><tbody>` +
     tls.map((t, i) => `<tr><td style="${sTd}">${esc(t)}</td><td style="${sTd}font-size:0.75rem;color:${T.gray400};">${esc(TOPIC_ISCO[t])}</td><td style="${sTdEnd}">${tvs[i]}</td><td style="${sTdEnd}">${prof[t].v[0]}</td><td style="${sTdEnd}">${prof[t].v[1]}</td><td style="${sTdEnd}">${prof[t].v[2]}</td></tr>`).join('') + '</tbody></table>');
   renderOccActivities(root, code, tls);
   tblSync(root, '#occ-table', OCC_TABS);
@@ -712,37 +716,50 @@ function renderOccActivities(root, code, topicsBySize) {
     tblBlock(root, '#occ-table', 'acts', '');
     return;
   }
-  const mine = occIwa(key, c, occSel).map(v => r1(v));
+  const mine = occGwa(key, c, occSel).map(v => r1(v));
   const tw = TOPIC_W.reduce((a, b) => a + b, 0);
-  const avg = IWA.map((_, i) => TOPICS.reduce((a, t, ti) => a + TOPIC_W[ti] * occIwa(key, c, t)[i], 0) / tw);
-  const ord = IWA.map((_, i) => i).sort((a, b) => mine[b] - mine[a]), top = ord.slice(0, 8);
+  const avg = GWA.map((_, i) => TOPICS.reduce((a, t, ti) => a + TOPIC_W[ti] * occGwa(key, c, t)[i], 0) / tw);
+  const ord = GWA.map((_, i) => i).sort((a, b) => mine[b] - mine[a]), top = ord.slice(0, 8);
   const scale = Math.max(...top.map(i => Math.max(mine[i], avg[i]))) * 1.08;
-  out.innerHTML = `<div style="font-size:0.8125rem;color:${T.gray600};margin:0 0 0.5rem;"><span style="display:inline-block;width:14px;height:10px;background:${MCOL.consumer};margin-right:0.35rem;"></span>Share of this occupation's conversations <span style="display:inline-block;width:2px;height:14px;background:${T.gray800};margin:0 0.35rem 0 1.25rem;vertical-align:middle;"></span>Share across all occupations</div>` +
+  out.innerHTML = `<div style="font-size:0.8125rem;color:${T.gray600};margin:0 0 0.5rem;"><span style="display:inline-block;width:14px;height:10px;background:${MCOL.consumer};margin-right:0.35rem;"></span>Share of this occupation's work-related AI use <span style="display:inline-block;width:2px;height:14px;background:${T.gray800};margin:0 0.35rem 0 1.25rem;vertical-align:middle;"></span>Weighted average across occupational topics</div>` +
     top.map(i => { const x = mine[i];
-      return `<div class="wa-row"><div class="wa-row-label">${esc(IWA[i])}</div><div class="wa-row-track" style="position:relative;"><div style="height:100%;width:${(100 * x / scale).toFixed(1)}%;background:${MCOL.consumer};"></div><div title="All occupations: ${avg[i].toFixed(1)}%" style="position:absolute;top:-2px;bottom:-2px;left:${(100 * avg[i] / scale).toFixed(1)}%;width:2px;background:${T.gray800};"></div></div><div class="wa-row-val"><strong>${x}%</strong> <span style="color:${T.gray600};">vs ${avg[i].toFixed(1)}% for all occupations</span></div></div>`; }).join('') +
-    `<p style="font-size:0.8125rem;color:${T.gray600};margin:0.75rem 0 0;">The eight largest of ${IWA.length} intermediate work activities are shown; the Table button lists all of them.</p>`;
-  tblBlock(root, '#occ-table', 'acts', `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Intermediate work activity (IWA), ${esc(occSel)}</th><th style="${sThEnd}">Share of this occupation's conversations (%)</th><th style="${sThEnd}">Share across all occupations (%)</th><th style="${sThEnd}">Difference (percentage points)</th></tr></thead><tbody>` +
-    ord.map(i => `<tr><td style="${sTd}">${esc(IWA[i])}</td><td style="${sTdEnd}">${mine[i]}</td><td style="${sTdEnd}">${avg[i].toFixed(1)}</td><td style="${sTdEnd}">${(mine[i] - avg[i] >= 0 ? '+' : '\u2212') + Math.abs(mine[i] - avg[i]).toFixed(1)}</td></tr>`).join('') + '</tbody></table>');
+      return `<div class="wa-row"><div class="wa-row-label">${esc(GWA[i])}</div><div class="wa-row-track" style="position:relative;"><div style="height:100%;width:${(100 * x / scale).toFixed(1)}%;background:${MCOL.consumer};"></div><div title="Weighted average across occupational topics: ${avg[i].toFixed(1)}%" style="position:absolute;top:-2px;bottom:-2px;left:${(100 * avg[i] / scale).toFixed(1)}%;width:2px;background:${T.gray800};"></div></div><div class="wa-row-val"><strong>${x}%</strong> <span style="color:${T.gray600};">vs ${avg[i].toFixed(1)}% weighted average</span></div></div>`; }).join('') +
+    `<p style="font-size:0.8125rem;color:${T.gray600};margin:0.75rem 0 0;">The eight largest of ${GWA.length} general work activities are shown; the Table button lists all ten.</p>`;
+  tblBlock(root, '#occ-table', 'acts', `<table style="${sTableBase}"><thead><tr><th style="${sTh}">General work activity (GWA), ${esc(occSel)}</th><th style="${sThEnd}">Share of this occupation's work-related AI use (%)</th><th style="${sThEnd}">Weighted average across occupational topics (%)</th><th style="${sThEnd}">Difference (percentage points)</th></tr></thead><tbody>` +
+    ord.map(i => `<tr><td style="${sTd}">${esc(GWA[i])}</td><td style="${sTdEnd}">${mine[i]}</td><td style="${sTdEnd}">${avg[i].toFixed(1)}</td><td style="${sTdEnd}">${(mine[i] - avg[i] >= 0 ? '+' : '\u2212') + Math.abs(mine[i] - avg[i]).toFixed(1)}</td></tr>`).join('') + '</tbody></table>');
 }
 
-// ---------- Industry (consumer): ranked bars + industry x use type x work activity ----------
-function ictMatrix(key, c, use) {
-  const one = u => IND10.map((_, i) => {
-    const raw = GWA_W.map((w, g) => w * ((ICT_AFF[i] || {})[g] || 1) * ICT_USE[u][g] * (0.85 + 0.3 * h(key + u + i + g)));
+// ---------- Industry (consumer): separate use-type and work-activity views ----------
+function ictMatrix(key) {
+  return IND10.map((_, i) => {
+    const raw = GWA_W.map((w, g) => w * ((ICT_AFF[i] || {})[g] || 1) * ICT_USE.Work[g] * (0.85 + 0.3 * h(key + 'Work' + i + g)));
     const s = raw.reduce((a, b) => a + b, 0); return raw.map(v => 100 * v / s);
   });
-  if (use !== 'all') return one(use);
-  const mats = ['Work', 'Personal', 'Education'].map(one), wts = c.use.map(v => v / 100);
-  return IND10.map((_, i) => GWA.map((_, g) => mats.reduce((a, m, u) => a + wts[u] * m[i][g], 0)));
+}
+function industryUseShares(key, c) {
+  return IND10.map((_, i) => to100(USE_NAMES.map((use, ui) => c.use[ui] * GWA_W.reduce((sum, weight, g) =>
+    sum + weight * ((ICT_AFF[i] || {})[g] || 1) * ICT_USE[use][g] * (0.85 + 0.3 * h(key + 'industry-use' + ui + i + g)), 0))));
+}
+function renderIndustryUseCross(root, key, c) {
+  const box = root.querySelector('#ict-use-box');
+  if (!c.ct[1]) {
+    box.innerHTML = `<div style="border-left:0.375rem solid ${T.orangeDark};background:${T.gray50};padding:0.75rem 1rem;"><strong>Not available for ${esc(c.name)}.</strong> The industry-by-use sample is below the disclosure threshold.</div>`;
+    return;
+  }
+  const values = industryUseShares(key, c);
+  const rows = IND10.map((name, i) => `<tr><th scope="row" style="${sTd}font-weight:500;">${esc(name)}</th>${values[i].map((v, ui) =>
+    `<td style="${sTdEnd}background:${USE_COL[ui]}18;color:${T.gray800};">${v}%</td>`).join('')}</tr>`).join('');
+  box.innerHTML = `<table style="${sTableBase}"><caption style="text-align:left;color:${T.gray600};padding:0.5rem 0;">Share of consumer AI activity within each industry; each row sums to 100%.</caption><thead><tr><th style="${sTh}">Industry</th>${USE_NAMES.map((use, ui) => `<th style="${sThEnd}color:${USE_COL[ui]};">${esc(use)} (%)</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 function renderIndustryCross(root, key, c, indW) {
   const box = root.querySelector('#ict-box');
-  if (!c.ct[1]) {
-    box.innerHTML = `<div style="border-left:0.375rem solid ${T.orangeDark};background:${T.gray50};padding:0.75rem 1rem;"><strong>Not available for ${esc(c.name)}.</strong> The sample is below the disclosure threshold for this cross-tab. It will appear when the sample is large enough.</div>`;
+  renderIndustryUseCross(root, key, c);
+  if (!c.ct[3]) {
+    box.innerHTML = `<div style="border-left:0.375rem solid ${T.orangeDark};background:${T.gray50};padding:0.75rem 1rem;"><strong>Not available for ${esc(c.name)}.</strong> The industry-by-GWA sample is below the disclosure threshold.</div>`;
     return;
   }
-  const use = root.querySelector('#sel-ict-use').value, view = root.querySelector('#sel-ict-view').value;
-  const m = ictMatrix(key, c, use), tw = indW.reduce((a, b) => a + b, 0);
+  const view = root.querySelector('#sel-ict-view').value;
+  const m = ictMatrix(key), tw = indW.reduce((a, b) => a + b, 0);
   const avg = GWA.map((_, g) => m.reduce((a, rw, i) => a + rw[g] * indW[i] / tw, 0));
   const val = (i, g) => view === 'share' ? m[i][g] : 100 * m[i][g] / avg[g];
   const all = IND10.flatMap((_, i) => GWA.map((_, g) => val(i, g)));
@@ -754,14 +771,14 @@ function renderIndustryCross(root, key, c, indW) {
     order.map(j => { const g = GWA[j], v = val(i, j), bg = ramp(t(v)), txt = view === 'share' ? v.toFixed(1) : String(Math.round(v)), strong = view === 'index' && v >= 150;
       return `<td title="${esc(name)} / ${esc(g)}: ${txt}${view === 'share' ? '%' : ''}" style="text-align:center;padding:0.5rem 0.125rem;background:${bg};color:${inkOn(bg)};font-size:0.8125rem;${strong ? 'font-weight:700;' : ''}">${txt}</td>`; }).join('') + '</tr>').join('');
   const note = view === 'share'
-    ? 'Each row adds to 100%. Darker cells are a bigger share of that industry\'s conversations.'
+    ? 'Each row adds to 100%. Darker cells are a bigger share of that industry\'s work-related AI use.'
     : '100 = the average industry. 150 means the industry does one and a half times as much of that activity as the average. Cells at or above 150 are in bold; cells below 100 are left pale.';
-  box.innerHTML = `<table style="border-collapse:separate;border-spacing:2px;width:100%;min-width:980px;table-layout:fixed;"><caption style="text-align:left;font-size:0.8125rem;color:${T.gray600};padding-bottom:0.5rem;caption-side:bottom;">${esc(note)}</caption><colgroup><col style="width:24%">${GWA.map(() => '<col>').join('')}</colgroup><thead><tr><th scope="col" style="text-align:left;vertical-align:bottom;font-weight:600;font-size:0.75rem;padding:0 0.5rem 0.4rem 0;color:${T.gray800};">Industry / work activity (largest first)</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+  box.innerHTML = `<table style="border-collapse:separate;border-spacing:2px;width:100%;min-width:980px;table-layout:fixed;"><caption style="text-align:left;font-size:0.8125rem;color:${T.gray600};padding-bottom:0.5rem;caption-side:bottom;">${esc(note)}</caption><colgroup><col style="width:24%">${GWA.map(() => '<col>').join('')}</colgroup><thead><tr><th scope="col" style="text-align:left;vertical-align:bottom;font-weight:600;font-size:0.75rem;padding:0 0.5rem 0.4rem 0;color:${T.gray800};">Industry / general work activity (GWA, largest first)</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 function renderIndustryConsumer(root, key, c) {
   const vals = shares(key + 'i10c', IND10, IND10C_W, c.tilt);
   hbar('c-indc', IND10, vals, { wrap: 46, colors: IND10.map(() => MCOL.consumer) });
-  root.querySelector('#indc-table').innerHTML = `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Industry</th><th style="${sThEnd}">Share of work-related conversations (%)</th></tr></thead><tbody>` +
+  root.querySelector('#indc-table').innerHTML = `<table style="${sTableBase}"><thead><tr><th style="${sTh}">Industry</th><th style="${sThEnd}">Share of work-related consumer AI activity (%)</th></tr></thead><tbody>` +
     IND10.map((n, i) => `<tr><td style="${sTd}">${esc(n)}</td><td style="${sTdEnd}">${vals[i]}</td></tr>`).join('') + '</tbody></table>';
   renderIndustryCross(root, key, c, IND10C_W);
 }
@@ -775,6 +792,7 @@ function renderCountry(root) {
   if (MAINP) {
   root.querySelector('#country-title').textContent = c.name;
   root.querySelector('#country-quarter').textContent = QUARTERS[q];
+  root.querySelector('#country-method-note').textContent = c.sample;
 
   const topicShare = shares(key + 'topic', TOPICS, TOPIC_W, c.tilt), [tl] = sortDesc(TOPICS, topicShare);
   const ind10M = shareSeries(code, 'i10', shares(code + 'i10', IND10, IND10_W, c.tilt), IND10_TREND, 0.05), api10 = ind10M[q], [al] = sortDesc(IND10, api10);
@@ -782,16 +800,15 @@ function renderCountry(root) {
   const chg = (kind, who) => { const sr = benchSeries(kind, who); return q > 0 ? { v: r1(100 * (sr[q] / sr[q - 1] - 1)), lvl: Math.round(sr[q]) } : { v: null, lvl: Math.round(sr[q]) }; };
   const signed = v => (v >= 0 ? '+' : '\u2212') + Math.abs(v).toFixed(1) + '%';
   const qcard = kind => {
-    const me = chg(kind, code), wd = chg(kind, 'World');
-    return [IND[kind], me.v == null ? 'n/a' : signed(me.v),
-      me.v == null ? `First quarter in the series. Index ${me.lvl}` : `Quarterly change. Index ${me.lvl}; world ${signed(wd.v)}`, MCOL[kind]];
+    const me = chg(kind, code);
+    return [IND[kind], me.v == null ? 'n/a' : signed(me.v), 'QoQ change in Growth Index', MCOL[kind]];
   };
   const cards = [
     qcard('consumer'),
     qcard('api'),
     ['Primary language of AI use', c.lang, c.lang2],
-    ['Dominant consumer activity', tl[0], 'Occupational topic with the largest share'],
-    ['Dominant API activity', al[0], 'Industry with the largest share of tokens']
+    ['Largest occupational topic', tl[0], 'Occupational topic with the largest share of sampled consumer AI activity'],
+    ['Largest API industry', al[0], 'Industry with the largest share of API tokens']
   ];
   root.querySelector('#stat-cards').innerHTML = cards.map(k =>
     `<div style="flex:1 1 200px;background:#fff;border:1px solid ${T.gray200};border-top:1px solid ${T.tealDark};${k[3] ? 'border-left:0.375rem solid ' + k[3] + ';' : ''}border-radius:${T.radiusLg};padding:1rem 1.125rem;box-shadow:${T.shadowSm};display:flex;flex-direction:column;">
@@ -905,7 +922,7 @@ function initModal(root) {
     const code = root.querySelector('#sel-country').value, c = C[code], q = QUARTERS[+root.querySelector('#sel-q').value];
     const rows = [['country', 'period', 'indicator', 'series', 'category', 'value']];
     [['c-lfpr', 'Labor force participation rate (%)'], ['c-adopt', 'AI adoption by use type (%)'], ['c-skills', 'Emerging AI skill demand (index, 0-100)'],
-     ['c-impact', 'AI Impact Index by industry (0-100)'], ['c-iwatrend', 'Top consumer activity use trends (% of work-related conversations)']].forEach(([id, title]) => {
+     ['c-impact', 'AI Impact Index by industry (0-100)'], ['c-iwatrend', 'Top consumer AI activity trends (% of work-related consumer AI activity)']].forEach(([id, title]) => {
       const ch = charts[id]; if (!ch) return;
       ch.data.datasets.forEach(ds => ds.data.forEach((v, i) => rows.push([c.name, q, title, ds.label, flat(ch.data.labels[i]), v])));
     });
@@ -913,7 +930,7 @@ function initModal(root) {
     const heads = Array.from(root.querySelectorAll('#p-pubct thead th')).slice(1).map(th => th.textContent.trim());
     Array.from(root.querySelectorAll('#p-pubct tbody tr')).forEach(tr => {
       const cells = Array.from(tr.children).map(td => td.textContent.trim());
-      heads.forEach((hd, j) => rows.push([c.name, q, 'IWA by industry: public service activities (% of public-sector conversations, four quarters pooled)', hd, cells[0], parseFloat(cells[j + 1])]));
+      heads.forEach((hd, j) => rows.push([c.name, q, 'IWA by industry: public service activities (% of public-sector consumer AI activity, four quarters pooled)', hd, cells[0], parseFloat(cells[j + 1])]));
     });
     const qs = q.replace(' ', '');
     return { scope: `${c.name}, ${q}`, slug: `${code}_${qs}`, params: `country=${code}&period=${qs}`, csv: rows.map(r => r.map(csvCell).join(',')).join('\n') };
@@ -956,36 +973,36 @@ function initModal(root) {
   });
 
   function openAccess(kind) {
-    const { ind, norm, values, vc, va } = mapState, c = C[root.querySelector('#sel-country').value], q = QUARTERS[+root.querySelector('#sel-q').value];
+    const { ind, norm, deciles } = mapState, c = C[root.querySelector('#sel-country').value], q = QUARTERS[+root.querySelector('#sel-q').value];
     copyText = ''; copyStatus.textContent = '';
     if (dlBtn) dlBtn.style.display = 'none';
     if (kind === 'csv') {
-      const text = 'country,normalization,consumer_activity_diffusion,api_usage_volume\n' + countries.slice().sort().map(n => `${csvCell(n)},${norm},${vc[n]},${va[n]}`).join('\n');
-      presentFile('Download .csv', `<p>Data behind the world map: <strong>${esc(IND.consumer)}</strong> and <strong>${esc(IND.api)}</strong> ${esc(NORM[norm])} for ${countries.length} countries, world median = 100. Check the contents below, then download or copy the file.</p>`,
+      const text = 'country,normalization,consumer_activity_decile,api_usage_decile\n' + countries.slice().sort().map(n => `${csvCell(n)},${norm},${deciles.consumer[n]},${deciles.api[n]}`).join('\n');
+      presentFile('Download .csv', `<p>Data behind the world map: <strong>${esc(IND.consumer)}</strong> and <strong>${esc(IND.api)}</strong> deciles, ${esc(NORM[norm])}, for ${countries.length} countries. Decile 1 is the lowest group and decile 10 the highest. Check the contents below, then download or copy the file.</p>`,
         text, `ai-adoption-index_world-map_${norm}.csv`);
       return;
     } else if (kind === 'api') {
       copyText = `curl "https://api.ai-adoption-index.example/v1/indicators?indicator=${ind}&normalize=${norm}&period=2026Q3&format=json"`;
       aTitle.textContent = 'Access via API';
-      aBody.innerHTML = `<p>Placeholder endpoint for the current map selection. The address is not real.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre><p style="margin-bottom:0.25rem;">Example response:</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(JSON.stringify({ indicator: ind, normalize: norm, period: '2026Q3', unit: 'world median = 100', data: [{ country: 'BRA', value: values['Brazil'] }, { country: 'MWI', value: values['Malawi'] }, { country: 'USA', value: values['United States of America'] }] }, null, 2))}</pre>`;
+      aBody.innerHTML = `<p>Placeholder endpoint for the current map selection. The address is not real. Values are deciles (1 = lowest group, 10 = highest group), not exact ranks.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre><p style="margin-bottom:0.25rem;">Example response:</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(JSON.stringify({ indicator: ind, normalize: norm, period: '2026Q3', unit: 'decile (1 = lowest, 10 = highest)', data: [{ country: 'BRA', value: deciles[ind]['Brazil'] }, { country: 'MWI', value: deciles[ind]['Malawi'] }, { country: 'USA', value: deciles[ind]['United States of America'] }] }, null, 2))}</pre>`;
     } else if (kind === 'cmpcsv') {
-      const { cor: kc, norm: kn, vc: cc, va: ca, fits } = cmpState;
-      const text = `country,normalization,consumer_activity_diffusion,api_usage_volume,${kc.id}\n` + countries.slice().sort().map(n => `${csvCell(n)},${kn},${cc[n]},${ca[n]},${corValue(n, kc)}`).join('\n');
-      presentFile('Download .csv', `<p>Data behind the comparison with <strong>${esc(kc.label)}</strong>: ${countries.length} countries. Fitted R² is ${fmt2(fits.consumer.r2)} for ${esc(IND.consumer)} and ${fmt2(fits.api.r2)} for ${esc(IND.api)}. Check the contents below, then download or copy the file.</p>`,
+      const { cor: kc, norm: kn, deciles: kd, fits } = cmpState;
+      const text = `country,normalization,consumer_activity_decile,api_usage_decile,${kc.id}\n` + countries.slice().sort().map(n => `${csvCell(n)},${kn},${kd.consumer[n]},${kd.api[n]},${corValue(n, kc)}`).join('\n');
+      presentFile('Download .csv', `<p>Data behind the comparison with <strong>${esc(kc.label)}</strong>: ${countries.length} countries, indicator values as deciles (1 = lowest group, 10 = highest group). Fitted R² is ${fmt2(fits.consumer.r2)} for ${esc(IND.consumer)} and ${fmt2(fits.api.r2)} for ${esc(IND.api)}. Check the contents below, then download or copy the file.</p>`,
         text, `ai-adoption-index_comparison_${kc.id}_${kn}.csv`);
       return;
     } else if (kind === 'cmpapi') {
       const { cor: kc, norm: kn } = cmpState;
       copyText = `curl "https://api.ai-adoption-index.example/v1/comparisons?compare=${kc.id}&normalize=${kn}&period=2026Q3&format=json"`;
       aTitle.textContent = 'Access via API';
-      aBody.innerHTML = `<p>Placeholder endpoint for the current comparison. The address is not real.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre>`;
+      aBody.innerHTML = `<p>Placeholder endpoint for the current comparison. The address is not real. Indicator values are deciles (1 = lowest group, 10 = highest group), not exact ranks.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre>`;
     } else if (kind === 'mcp') {
       copyText = JSON.stringify({ mcpServers: { 'ai-adoption-index': { type: 'http', url: 'https://mcp.ai-adoption-index.example/mcp' } } }, null, 2);
       aTitle.textContent = 'Access via MCP (proposed)';
-      aBody.innerHTML = `<p>An MCP server would let AI assistants query the Index directly, for example "compare consumer activity per working-age person in Brazil and Malawi". Placeholder configuration; the address is not real.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre><p style="margin:0;">Possible tools: <code>list_indicators</code>, <code>get_indicator</code>, <code>get_country_profile</code>, <code>compare_countries</code>.</p>`;
+      aBody.innerHTML = `<p>An MCP server would let AI assistants query the Index directly, for example "compare consumer AI use per working-age resident in Brazil and Malawi". Placeholder configuration; the address is not real.</p><pre style="background:${T.gray100};border:1px solid ${T.gray200};border-radius:${T.radius};padding:0.75rem;font-size:0.8125rem;max-height:18rem;overflow:auto;white-space:pre-wrap;">${esc(copyText)}</pre><p style="margin:0;">Possible tools: <code>list_indicators</code>, <code>get_indicator</code>, <code>get_country_profile</code>, <code>compare_countries</code>.</p>`;
     } else if (kind === 'pdf') {
       aTitle.textContent = 'Country report (.pdf)';
-      aBody.innerHTML = `<p>In the live site this downloads a formatted report for <strong>${esc(c.name)}, ${q}</strong>: the headline cards, every chart on the Consumer activity diffusion and API usage volume tabs, and a methods note.</p><p style="margin:0;">Not generated in this mock.</p>`;
+      aBody.innerHTML = `<p>In the live site this downloads a formatted report for <strong>${esc(c.name)}, ${q}</strong>: the headline cards, every chart on the ${esc(IND.consumer)} and ${esc(IND.api)} tabs, and a methods note.</p><p style="margin:0;">Not generated in this mock.</p>`;
     } else {
       copyText = 'country,period,section,indicator,category,value\n' +
         [['consumer', 'use_type', 'Work', c.use[0]], ['consumer', 'use_type', 'Personal', c.use[1]], ['consumer', 'use_type', 'Education', c.use[2]]].concat(c.langs.map(l => ['consumer', 'language', l[0], l[1]])).map(rw => `${c.name},${q},${rw.join(',')}`).join('\n') + '\n...';
@@ -1050,7 +1067,7 @@ function initQuestionFrames(root) {
 // =====================================================================
 const CX = 'Country X';
 const QX_COLS = [   // columns of the overview matrix
-  ['cons', 'Consumer activity diffusion', 0], ['api', 'API usage volume', 0],
+  ['cons', 'Consumer AI use', 0], ['api', 'API token volume', 0],
   ['use', 'Use type', 1], ['act', 'Work activity', 1], ['occ', 'Occupational topic', 1], ['ind', 'Industry', 1], ['prof', 'Proficiency', 1], ['lang', 'Language', 1], ['mod', 'API model type', 1]
 ];
 const QX_FIT = {
@@ -1075,14 +1092,14 @@ const QX_W3 = {
     use: [17, 16, 11, 10, 6, 5, 5, 4]
   },
   B: [
-    { id: 'Information and communications technology', rows: [['Advise others on the design or use of technologies', 5, 10, 9], ['Resolve computer problems', 3, 6, 5], ['Design computer or information systems or applications', 4, 5, 3], ['Program computer systems or production equipment', 3, 4, 3], ['Process digital or online data', 2, 4, 3]] },
-    { id: 'Business and administration', rows: [['Advise others on financial matters', 4, 10, 8], ['Develop marketing or promotional materials', 3, 8, 6], ['Analyze data to improve operations', 4, 6, 4], ['Advise others on business or operational matters', 4, 5, 3], ['Analyze market or industry conditions', 2, 4, 3]] },
-    { id: 'Science and engineering', rows: [['Analyze scientific or applied data using mathematical principles', 4, 8, 6], ['Design computer or information systems or applications', 3, 7, 5], ['Present research or technical information', 4, 6, 3], ['Create visual designs or displays', 2, 5, 4], ['Program computer systems or production equipment', 2, 4, 3]] },
-    { id: 'Management', rows: [['Advise others on products or services', 4, 8, 6], ['Develop marketing or promotional materials', 3, 7, 5], ['Analyze data to improve operations', 4, 6, 3], ['Advise others on business or operational matters', 3, 6, 4], ['Respond to customer problems or inquiries', 2, 4, 2]] },
-    { id: 'Clerical support', rows: [['Gather information from physical or electronic sources', 6, 7, 3], ['Respond to customer problems or inquiries', 5, 6, 2], ['Process digital or online data', 5, 4, 2], ['Provide information to guests, clients, or customers', 4, 5, 2], ['Explain technical details of products or services', 3, 4, 1]] },
-    { id: 'Teaching', rows: [['Prepare informational or instructional materials', 5, 9, 6], ['Teach academic or vocational subjects', 4, 7, 4], ['Advise others on educational or vocational matters', 3, 6, 4], ['Assess student capabilities, needs, or performance', 4, 4, 2], ['Develop educational programs, plans, or procedures', 2, 3, 2]] },
-    { id: 'Service and sales', rows: [['Advise others on products or services', 6, 6, 2], ['Respond to customer problems or inquiries', 5, 5, 2], ['Provide information to guests, clients, or customers', 5, 4, 1], ['Prepare informational or instructional materials', 3, 3, 1], ['Explain technical details of products or services', 3, 3, 1]] },
-    { id: 'Health', rows: [['Advise patients or clients on medical issues', 5, 7, 4], ['Advise others on healthcare or wellness issues', 4, 6, 3], ['Analyze health or medical data', 3, 5, 2], ['Explain medical information to patients or family members', 2, 4, 3], ['Prepare informational or instructional materials', 2, 3, 2]] }
+    { id: 'Information and communications technology', rows: [['Working with computers', 5, 10, 9], ['Analyzing data or information', 3, 6, 5], ['Providing consultation and advice to others', 4, 5, 3], ['Getting information', 3, 4, 3], ['Making decisions and solving problems', 2, 4, 3]] },
+    { id: 'Business and administration', rows: [['Documenting and recording information', 4, 10, 8], ['Analyzing data or information', 3, 8, 6], ['Providing consultation and advice to others', 4, 6, 4], ['Making decisions and solving problems', 4, 5, 3], ['Getting information', 2, 4, 3]] },
+    { id: 'Science and engineering', rows: [['Analyzing data or information', 4, 8, 6], ['Working with computers', 3, 7, 5], ['Thinking creatively', 4, 6, 3], ['Documenting and recording information', 2, 5, 4], ['Getting information', 2, 4, 3]] },
+    { id: 'Management', rows: [['Making decisions and solving problems', 4, 8, 6], ['Providing consultation and advice to others', 3, 7, 5], ['Analyzing data or information', 4, 6, 3], ['Communicating with people outside the organization', 3, 6, 4], ['Thinking creatively', 2, 4, 2]] },
+    { id: 'Clerical support', rows: [['Getting information', 6, 7, 3], ['Documenting and recording information', 5, 6, 2], ['Working with computers', 5, 4, 2], ['Communicating with people outside the organization', 4, 5, 2], ['Interpreting the meaning of information for others', 3, 4, 1]] },
+    { id: 'Teaching', rows: [['Training and teaching others', 5, 9, 6], ['Getting information', 4, 7, 4], ['Documenting and recording information', 3, 6, 4], ['Interpreting the meaning of information for others', 4, 4, 2], ['Making decisions and solving problems', 2, 3, 2]] },
+    { id: 'Service and sales', rows: [['Communicating with people outside the organization', 6, 6, 2], ['Getting information', 5, 5, 2], ['Providing consultation and advice to others', 5, 4, 1], ['Making decisions and solving problems', 3, 3, 1], ['Interpreting the meaning of information for others', 3, 3, 1]] },
+    { id: 'Health', rows: [['Providing consultation and advice to others', 5, 7, 4], ['Interpreting the meaning of information for others', 4, 6, 3], ['Getting information', 3, 5, 2], ['Analyzing data or information', 2, 4, 3], ['Training and teaching others', 2, 3, 2]] }
   ],
   signals: [
     { v: '+195%', t: 'Coursera enrollments in generative AI courses, 2025 against 2024, worldwide (more than 8 million in total). A global figure; it says nothing specific about one country.', s: 'Coursera Global Skills Report 2025', u: 'https://blog.coursera.org/presenting-courseras-2025-global-skills-report-the-skills-trends-shaping-the-future-of-education-and-employment' },
@@ -1102,7 +1119,7 @@ const qxGr = a => Math.round(100 * (a[a.length - 1] / a[0] - 1));
 const qxIdx = (key, e) => { const v = trend(key, e[0] * 10, e[1] * 10); return v.map(x => Math.round(100 * x / v[0])); };
 const lcs = s => s.toLowerCase();
 const QX_URL = { ookla: 'https://registry.opendata.aws/speedtest-global-performance/', talis: 'https://read.oecd-ilibrary.org/en/about/programmes/talis/talis-participants.html', belebele: 'https://huggingface.co/datasets/facebook/belebele', cetic: 'https://www.cg.org.br/media/docs/publicacoes/2/20250512121112/ict_enterprises_2024_executive_summary.pdf', btos: 'https://census.gov/library/stories/2026/05/ai-use-businesses.html', wbes: 'https://www.enterprisesurveys.org/en/data/data-updates', ilo140: 'https://webapps.ilo.org/static/english/intserv/working-papers/wp140/index.html', egdi: 'https://publicadministration.un.org/egovkb/en-us/Reports/UN-E-Government-Survey-2024', gtmi: 'https://www.worldbank.org/en/programs/govtech/gtmi-2025-update', wwbi: 'https://datacatalog.worldbank.org/search/dataset/0038132/worldwide-bureaucracy-indicators', clear: 'https://clearglobal.org/cg_resource_type/language-maps-and-data/', dhslang: 'https://microdata.worldbank.org/index.php/catalog/3188/variable/F68/V3123?name=v045c', afrolang: 'https://microdata.worldbank.org/catalog/4745/variable/F1/V40?name=Q2', uis4a1: 'https://uis.unesco.org/en/glossary-term/proportion-schools-access-internet-pedagogical-purposes', giga: 'https://giga.global' };
-const QX_MIN = 'Sample size. Under the sampling standard (100 conversations per cell), countries outside the 12 high-usage countries can report about 42 activities each quarter, 53 with two quarters pooled and 69 with a year. Activities within an occupation, industry or use type are smaller cells: they are published annually by country or quarterly by region, and the rarest only by region.';
+const QX_MIN = 'Sample size. Under the sampling standard (100 conversations per cell), countries outside the 12 high-usage countries can report about 42 activities each quarter, 53 with two quarters pooled and 69 with a year. Detailed cuts by occupation, industry or use type are smaller cells; country-level publication depends on sample size and may require pooling or suppression.';
 const QX_SELECT = 'Who uses AI: Index shares describe AI activity from people who use these tools, who are not a random sample. Supplemental figures describe the whole population or workforce, so gaps between them partly reflect who has access.';
 
 // Q1 part b: illustrative Admin 2 districts. r,c = hex grid position; s = median mobile download (Mbps, Ookla); a = AI use per 100 people (Index; null = hidden, too little activity); p = population (thousands)
@@ -1126,11 +1143,11 @@ const QX = [
     fit: 'combined', g: { cons: 'c' }, supp: 'Connectivity',
     ask: ['Is AI use low because few people are online, or because people who are online do not use it?', 'For people who are not online, is the gap network coverage, or getting people who are covered online?', 'Among people who are covered, is the barrier the cost of data, devices or electricity?', 'If district-level Index data become available: in which districts are both connection quality and AI use low?'],
     scope: 'The Index measures use, not infrastructure. Here infrastructure means network coverage and quality, the cost of data, devices and electricity, each measured by a supplemental dataset.',
-    index: [{ k: 'c', t: 'Consumer activity diffusion', d: 'share of the working-age population using AI monthly; also per internet user' }, { k: 'c', t: 'Consumer activity diffusion by Admin 2 district', d: 'prospective; part b' }],
+    index: [{ k: 'c', t: 'Consumer AI use', d: 'share of the working-age population using AI monthly; also per internet user' }, { k: 'c', t: 'Consumer AI use by Admin 2 district', d: 'prospective; part b' }],
     supps: [{ t: 'ITU', d: 'population covered by a 4G network; internet use among people of working age (from household surveys)' }, { t: 'ITU price baskets', d: '2 GB mobile data basket as % of monthly GNI per capita' }, { t: 'ITU household ICT data, World Bank WDI', d: 'mobile phone ownership, household computers; electricity access' }, { t: 'Ookla', d: 'speed and latency tiles, fixed and mobile, aggregated to Admin 2 (part b)' }, { t: 'WorldPop or census', d: 'working-age population by Admin 2, to weight Ookla tiles and as the denominator (part b)' }],
     also: [['Ookla Open Data', QX_URL.ookla, 'speed and latency tiles of about 610 m, quarterly']],
     limits: ['Why people who are online do not use AI. The funnel locates the gap; skills, language (Question 5) and relevance explain more of it.', 'Cause, in the district view. Districts with faster connections are usually richer and more urban too, so the view ranks districts for further study; it does not show that speed drives use.', 'Small districts. Admin 2 cells below the minimum amount of activity are hidden, so the smallest rural districts, where coverage matters most, may be blank.', 'Ookla speeds come only from people who run speed tests. Districts with few tests have unreliable figures, and no tests does not mean no network.', 'Timing. ITU coverage and internet-use figures are annual and lag; the Index is quarterly.'],
-    use: ['Compare the coverage gap (people outside the network) with the usage gap (people covered but offline). The larger one tells you whether to invest in extending the network or in getting covered people online.', 'If the usage gap dominates, use the price, device and electricity data to choose the lever: data affordability against the 2% target, device ownership or power access.', 'If AI use is low among people already online, infrastructure is less likely to be the constraint: look at skills, language (Question 5) and relevance.', 'With district data, target network investment where both connection quality and AI use are low, and non-network programs where connections are adequate but use is low. Check speed-test counts before acting on any one district.'],
+    context: ['Target digital infrastructure where access limits adoption, by combining usage data with connectivity, electricity and device data.', 'Use connectivity and access to inform decisions and investments.'],
     build() {
       const D = QX_D1, tot = D.reduce((s, d) => s + d.p, 0), seen = D.filter(d => d.a != null);
       const ai = Math.round(seen.reduce((s, d) => s + d.a * d.p, 0) / seen.reduce((s, d) => s + d.p, 0));
@@ -1141,10 +1158,10 @@ const QX = [
       const pp = a => Math.round(100 * a.reduce((s, d) => s + d.p, 0) / tot), nm = a => { const ids = a.map(d => d.n.replace('District ', '')); return a.length === 1 ? a[0].n : 'Districts ' + ids.slice(0, -1).join(', ') + ' and ' + ids[ids.length - 1]; };
       const funnel = { kind: 'bars', horizontal: true, labels: ['Working-age population', 'Covered by a 4G network', 'Uses the internet', 'Uses AI monthly'], unit: '%', max: 100,
         series: [{ name: 'Share of the working-age population (%)', color: ['supp', 'supp', 'supp', 'consumer'], data: [100, cov, onl, ai] }],
-        legend: [{ name: 'Supplemental: ITU', color: 'supp' }, { name: 'Index: consumer activity diffusion', color: 'consumer' }],
-        title: `From population to AI use in ${CX}`, sub: 'Share of the working-age population at each step (%)', src: 'ITU (4G population coverage; internet use among people of working age, from household surveys); Index (consumer activity diffusion: share of the working-age population using AI monthly). Values are illustrative.', alt: `Bar chart for ${CX}: of the working-age population, ${cov}% covered by 4G, ${onl}% online, ${ai}% using AI monthly.` };
+        legend: [{ name: 'Supplemental: ITU', color: 'supp' }, { name: 'Index: consumer AI activity diffusion', color: 'consumer' }],
+        title: `From population to consumer AI use in ${CX}`, sub: 'Share of the working-age population at each step (%)', src: 'ITU (4G population coverage; internet use among people of working age, from household surveys); Index (consumer AI activity diffusion: share of the working-age population using AI monthly). Values are illustrative.', alt: `Bar chart for ${CX}: of the working-age population, ${cov}% covered by 4G, ${onl}% online, ${ai}% using AI monthly.` };
       const head = ug > cg ? 'Most people who are offline live where there is a network' : 'The network itself is the largest gap';
-      const scat = { kind: 'scatter', title: `Connection speed and AI use in ${CX}, by district`, sub: 'One dot per Admin 2 district; latest quarter', src: 'Ookla open data aggregated to Admin 2 districts; Index consumer activity diffusion by Admin 2 (prospective); WorldPop or census working-age population. Values are illustrative.', alt: `Scatter plot for ${CX}: median mobile download speed against AI use per 100 people, one dot per district.`,
+      const scat = { kind: 'scatter', title: `Connection speed and consumer AI use in ${CX}, by district`, sub: 'One dot per Admin 2 district; latest quarter', src: 'Ookla open data aggregated to Admin 2 districts; Index consumer AI activity diffusion by Admin 2 (prospective); WorldPop or census working-age population. Values are illustrative.', alt: `Scatter plot for ${CX}: median mobile download speed against consumer AI use per 100 people, one dot per district.`,
         xl: 'Median mobile download speed (Mbps, Ookla)', yl: 'AI users per 100 working-age people (Index)', pts: seen.map(d => ({ x: d.s, y: d.a, n: d.n, c: QX_BIV[cls(d)[1]][cls(d)[0]] })) };
       return {
         title: `How does infrastructure limit AI use in ${CX}?`,
@@ -1160,30 +1177,30 @@ const QX = [
   {
     asked: { Education: 'UNICEF, World Bank, OECD' },
     fit: 'combined', g: { use: 'c', act: 'c', occ: 'c', prof: 'c' }, supp: 'Teaching workforce',
-    ask: ['How has teaching’s share of work-related AI activity changed, and how does it compare with the regional and OECD aggregates?', 'Within teaching, which activities does AI support, and at what proficiency are teaching requests overall?', 'Where Country X took part in TALIS 2024, what share of teachers report using AI?'],
-    scope: 'Part a uses the Index occupational topic for teaching, which follows ISCO-08 (group 23). Part b breaks that topic down by the O*NET teaching activities (IWAs). Activity where a student is being taught falls under the Education use type and is excluded.',
-    index: [{ k: 'c', t: 'Use type: Work', d: 'AI activity related to a job' }, { k: 'c', t: 'Occupational topic: Teaching', d: 'follows ISCO-08 group 23' }, { k: 'c', t: 'Regional and OECD aggregates', d: 'the same measure, pooled across countries' }, { k: 'c', t: 'Teaching-related IWAs', d: 'e.g. Prepare informational or instructional materials; Teach academic or vocational subjects; Assess student capabilities, needs, or performance. Annual by country, quarterly by region' }, { k: 'c', t: 'Proficiency', d: 'estimated level of expertise, from the wording of the request: low, medium or high' }],
+    ask: ['How has teaching’s share of work-related consumer AI activity changed, and how does it compare with the regional and OECD aggregates?', 'Within teaching, which activities does AI support, and at what proficiency are teaching requests overall?', 'Where Country X took part in TALIS 2024, what share of teachers report using AI?'],
+    scope: 'Part a uses the Index occupational topic for teaching, which follows ISCO-08 (group 23). Part b uses broad O*NET general work activities (GWAs), not more granular IWAs, to reduce small occupation-level cross-tabs. Activity where a student is being taught falls under the Education use type and is excluded.',
+    index: [{ k: 'c', t: 'Use type: Work', d: 'work-related consumer AI activity' }, { k: 'c', t: 'Occupational topic: Teaching', d: 'follows ISCO-08 group 23' }, { k: 'c', t: 'Regional and OECD aggregates', d: 'the same measure, pooled across countries' }, { k: 'c', t: 'Teaching-related GWAs', d: 'broad O*NET general work activities; publication depends on sample size' }, { k: 'c', t: 'Proficiency', d: 'estimated level of expertise, from the wording of the request: low, medium or high' }],
     supps: [{ t: 'ILOSTAT', d: 'number of teaching professionals (ISCO 23)' }, { t: 'UNESCO UIS', d: 'pupil–teacher ratio; schools with internet for teaching (SDG 4.a.1)' }, { t: 'OECD TALIS 2024', d: 'teachers’ reported AI use; participating systems only' }],
     also: [['OECD TALIS participants', QX_URL.talis, '55 education systems in 2024; South Africa is the only Sub-Saharan African participant listed'], ['UIS: schools with internet', QX_URL.uis4a1, 'SDG 4.a.1, data to 2025'], ['Giga', QX_URL.giga, 'school locations and connectivity']],
     limits: ['How many teachers use AI. Activity is not people: heavy users and automated agents count many times. Only a teacher survey such as TALIS gives the share of teachers.', 'Why Country X differs from the aggregates. A larger teaching share can reflect a larger teaching workforce or less AI use in other occupations, not only more use by teachers.', 'Who is a teacher. The topic is inferred from what the activity is about, so trainers and tutors may be included.', 'Timing. ILOSTAT and UIS figures are annual and lag one to two years, and TALIS is a single 2024 round: they are baselines, not quarterly series.', 'Whether AI improves teaching or grading quality.', QX_MIN],
-    use: ['If teaching’s share is at or above the regional and OECD aggregates and rising, use is already established: set guidance on acceptable use, student data and academic integrity rather than waiting for pilots. If it lags, check access first, using school connectivity data.', 'Build teacher guidance and training around the most common teaching activities, pitched at the proficiency the data show.', 'Where pupil–teacher ratios are high, assessment and feedback are where time savings matter most: decide whether to support AI-assisted assessment with vetted tools, given the fairness and privacy questions it raises.', 'To learn how many teachers use AI, use TALIS where the country took part, or add one AI question to the national teacher survey. Size training against the number of teachers employed.'],
+    context: ['Design teacher support and chatbots around how teachers use AI for curriculum design, preparing materials and assessing students.'],
     build() {
       const tp = trend('q2t', 41, 60).map(v => r1(v / 10)), rg = trend('q2r', 36, 46).map(v => r1(v / 10)), oe = trend('q2o', 52, 66).map(v => r1(v / 10)), last = tp.length - 1;
-      const acts = [['Prepare informational or instructional materials', [7, 12, 8]], ['Teach academic or vocational subjects', [8, 10, 4]], ['Advise others on educational or vocational matters', [5, 8, 4]], ['Assess student capabilities, needs, or performance', [3, 4, 2]], ['Develop educational programs, plans, or procedures', [2, 3, 1]]];
-      const short = ['Preparing teaching materials', 'Teaching subject content', 'Advising students', 'Assessing students', 'Planning lessons and programs'];
+      const acts = [['Training and teaching others', [8, 12, 10]], ['Getting information', [7, 9, 8]], ['Documenting and recording information', [5, 7, 6]], ['Interpreting the meaning of information for others', [3, 5, 4]], ['Making decisions and solving problems', [2, 4, 3]]];
+      const short = ['Training and teaching', 'Getting information', 'Documenting information', 'Interpreting information', 'Making decisions'];
       const rows = acts.map(a => [a[0]].concat(a[1])), tot = rows.map(r => r[1] + r[2] + r[3]), all = tot.reduce((a, b) => a + b, 0);
       const ti = tot.indexOf(Math.max.apply(null, tot)), mhp = Math.round(100 * rows.reduce((s, r) => s + r[2] + r[3], 0) / all);
       return {
         title: `Are teachers in ${CX} using AI, and if so, how are they using it?`,
-        subA: 'Are they using it: teaching’s share of work-related AI activity',
+        subA: 'Are they using it: teaching’s share of work-related consumer AI activity',
         chart: { kind: 'line', labels: QUARTERS, unit: '%', ymin: 0, yl: 'Share (%)', series: [{ name: `${CX} (Index)`, color: 'consumer', data: tp }, { name: 'Regional aggregate (Index)', color: RAMP[2], data: rg, dash: true }, { name: 'OECD aggregate (Index)', color: T.gray400, data: oe, dash: true }],
-          title: `Teaching’s share of work-related AI activity: ${CX} against regional and OECD aggregates`, sub: 'By quarter (%)', src: 'Index: work use type, occupational topic Teaching; regional and OECD aggregates of the same measure. Values are illustrative.', alt: `Line chart: teaching’s share of work-related AI activity by quarter for ${CX}, the regional aggregate and the OECD aggregate.` },
+          title: `Teaching’s share of work-related consumer AI activity: ${CX} against regional and OECD aggregates`, sub: 'By quarter (%)', src: 'Index: work use type, occupational topic Teaching; regional and OECD aggregates of the same measure. Values are illustrative.', alt: `Line chart: teaching’s share of work-related consumer AI activity by quarter for ${CX}, the regional aggregate and the OECD aggregate.` },
         note: { head: tp[last] > rg[last] ? `${CX} is above the regional aggregate` : `${CX} is below the regional aggregate`,
-          text: [`Teaching went from ${tp[0]}% to ${tp[last]}% of work-related AI activity in ${CX}, against ${rg[last]}% for the region and ${oe[last]}% for the OECD in the latest quarter.`, 'This is a share of activity, not of teachers: it cannot say how many teachers use AI.'] },
-        subB: 'How they use it: teaching activities',
-        chart2: { kind: 'bars', horizontal: true, labels: rows.map(r => r[0]), unit: '%', max: qxNice([tot], 5, 1.25), series: [{ name: 'Share of the teaching topic’s work-related AI activity (%)', color: 'consumer', data: tot }],
-          title: `What teaching activities AI supports in ${CX}`, sub: 'Share of the teaching topic’s work-related AI activity (%), by O*NET IWA, latest four quarters pooled. Other activities make up the rest.', src: 'Index: work use type, occupational topic Teaching, O*NET intermediate work activities. Values are illustrative.', alt: `Bar chart for ${CX}: five teaching-related work activities by share of the teaching topic’s AI activity, four quarters pooled.` },
-        note2: { head: `${short[ti]} is the most common use`, text: [`“${rows[ti][0]}” accounts for ${tot[ti]}% of teaching’s work-related AI activity in ${CX}.`, `Across the teaching topic, ${mhp}% of requests are at medium or high proficiency. The Index rates proficiency by occupational topic, not by activity.`] },
+          text: [`Teaching went from ${tp[0]}% to ${tp[last]}% of work-related consumer AI activity in ${CX}, against ${rg[last]}% for the region and ${oe[last]}% for the OECD in the latest quarter.`, 'This is a share of activity, not of teachers: it cannot say how many teachers use AI.'] },
+        subB: 'How they use it: broad work activities',
+        chart2: { kind: 'bars', horizontal: true, labels: rows.map(r => r[0]), unit: '%', max: qxNice([tot], 5, 1.25), series: [{ name: 'Share of the teaching topic’s work-related consumer AI activity (%)', color: 'consumer', data: tot }],
+          title: `What broad work activities consumer AI supports in ${CX}’s teaching topic`, sub: 'Share of the teaching topic’s work-related consumer AI activity (%), by O*NET GWA. Values are illustrative.', src: 'Index: work use type, occupational topic Teaching, O*NET general work activities. Values are illustrative.', alt: `Bar chart for ${CX}: five general work activities by share of the teaching topic’s work-related consumer AI activity.` },
+        note2: { head: `${short[ti]} is the most common use`, text: [`“${rows[ti][0]}” accounts for ${tot[ti]}% of teaching’s work-related consumer AI activity in ${CX}.`, `Across the teaching topic, ${mhp}% of requests are at medium or high proficiency. The Index rates proficiency by occupational topic, not by activity.`] },
         tiles: [{ v: mhp + '%', l: 'of teaching-topic AI requests are at medium or high proficiency (rated for the topic as a whole)', s: 'Index: proficiency by occupational topic', k: 'c' }, { v: '41%', l: 'of lower-secondary teachers report using AI in their work (only if Country X took part)', s: 'OECD TALIS 2024', k: 's' }, { v: '38', l: 'pupils per teacher in primary education', s: 'UNESCO UIS, latest year', k: 's' }, { v: '46%', l: 'of primary schools have internet for teaching', s: 'UNESCO UIS (SDG 4.a.1), latest year', k: 's' }, { v: '1.4 million', l: 'teachers employed (ISCO group 23)', s: 'ILOSTAT, 2024', k: 's' }]
       };
     }
@@ -1193,9 +1210,9 @@ const QX = [
     asked: { Education: 'World Bank, ADB', Labor: 'UNICEF' },
     fit: 'combined', g: { use: 'c', act: 'c', occ: 'c', prof: 'c' }, supp: 'Labour and skills', worked: true,
     ask: ['In which occupations is AI moving into work fastest?', 'Within those occupations, which work activities does AI support, and at what proficiency are the occupation’s requests?', 'In the job market, which skills are employers requesting less, which more, and which are new?', 'Which fields are people getting certified in, AI and otherwise, and how is that shifting?'],
-    index: [{ k: 'c', t: 'Use type: Work', d: 'AI activity related to a job' }, { k: 'c', t: 'Occupational topic', d: '15 topics that follow ISCO-08 occupation groups' }, { k: 'c', t: 'Work activity', d: 'O*NET’s 41 general work activities, each split into intermediate activities' }, { k: 'c', t: 'Proficiency', d: 'estimated level of expertise, from the wording of the request: low, medium or high' }],
+    index: [{ k: 'c', t: 'Use type: Work', d: 'work-related consumer AI activity' }, { k: 'c', t: 'Occupational topic', d: '15 topics that follow ISCO-08 occupation groups' }, { k: 'c', t: 'Work activity', d: 'broad O*NET general work activities (GWAs); no occupation-by-IWA breakdown' }, { k: 'c', t: 'Proficiency', d: 'estimated level of expertise, from the wording of the request: low, medium or high' }],
     limits: ['What people can do without AI. The Index shows what they ask AI to do, not their underlying skill.', 'Activity is not people: heavy users and automated agents count many times, so a growing share can reflect a few intensive users.', 'Who posts and who certifies. Online job postings over-represent formal, urban jobs; platform learners are not the workforce; certifications listed on LinkedIn are self-reported.', 'Cause. A skill falling in postings can reflect the business cycle or other shifts in demand, not AI: compare with other skills over the same period before attributing a change to AI.', QX_MIN],
-    use: ['Prioritize curriculum review for occupations where AI’s share of work-related activity is growing fastest: graduates entering them will meet AI at work.', 'Use the activity breakdown to decide what each program teaches, and the occupation’s proficiency mix to set the level. Where requests are already sophisticated, teach how to direct and check AI, not only how to use it.', 'Where requests for skills such as translation or copyediting fall in postings, consider shifting programs from producing that output to reviewing and directing AI output. Add skills that are new in postings to short courses.', 'Read certifications as supply and postings as demand. If people certify in fields where postings are falling, redirect funding; if they move into fields where demand is rising, support the move.', 'Where AI barely reaches an occupation, find out why before acting: weak access, no relevant tools and low relevance call for different responses.'],
+    context: ['Update TVET and higher education curricula toward the skills people need, based on how AI is used.'],
     build() {
       const W = QX_W3, A = W.A, u0 = A.use0, u1 = A.use, n = A.labels.length;
       const ch = A.labels.map((l, i) => ({ l, d: u1[i] - u0[i] })).sort((x, y) => y.d - x.d);
@@ -1210,14 +1227,14 @@ const QX = [
       return {
         title: `How should curricula and skills programs in ${CX} change in anticipation of increased AI adoption?`,
         A: { kind: 'bars', horizontal: true, labels: A.labels, unit: '%', max: qxNice([u0, u1], 5, 1.2), series: [{ name: '2025 Q1', color: RAMP[1], data: u0 }, { name: '2026 Q3', color: 'consumer', data: u1 }],
-          title: `Share of work-related AI activity in ${CX}, by occupation`, sub: 'Index occupational topics; 2025 Q1 against the latest quarter (%)', src: 'Index: work use type, occupational topics. Values are illustrative.', alt: `Horizontal bar chart for ${CX}: each occupation’s share of work-related AI activity in 2025 Q1 and 2026 Q3.` },
-        B: { kind: 'bars', horizontal: true, labels: rows.map(r => r[0]), unit: '%', max: qxNice([rows.map(r => r[1] + r[2] + r[3])], 5, 1.25), series: [{ name: 'Share of the occupation’s work-related AI activity (%)', color: 'consumer', data: rows.map(r => r[1] + r[2] + r[3]) }],
-          title: `What people in this occupation in ${CX} use AI for`, sub: 'Share of the occupation’s work-related AI activity (%), five largest O*NET intermediate work activities (IWAs), latest four quarters pooled', src: 'Index: work use type, occupational topic, intermediate work activities (IWAs). Values are illustrative.', alt: `Bar chart for ${CX}: the five most common work activities in the selected occupation.` },
+          title: `Share of work-related consumer AI activity in ${CX}, by occupation`, sub: 'Index occupational topics; 2025 Q1 against the latest quarter (%)', src: 'Index: work use type, occupational topics. Values are illustrative.', alt: `Horizontal bar chart for ${CX}: each occupation’s share of work-related consumer AI activity in 2025 Q1 and 2026 Q3.` },
+        B: { kind: 'bars', horizontal: true, labels: rows.map(r => r[0]), unit: '%', max: qxNice([rows.map(r => r[1] + r[2] + r[3])], 5, 1.25), series: [{ name: 'Share of the occupation’s work-related consumer AI activity (%)', color: 'consumer', data: rows.map(r => r[1] + r[2] + r[3]) }],
+          title: `What broad work activities people in this occupation in ${CX} use AI for`, sub: 'Share of the occupation’s work-related consumer AI activity (%), by O*NET general work activity (GWA). Values are illustrative.', src: 'Index: work use type, occupational topic, general work activities (GWAs). Values are illustrative.', alt: `Bar chart for ${CX}: general work activities by share of the selected occupation’s work-related consumer AI activity.` },
         C: { kind: 'bars', horizontal: true, signed: true, rowH: 38, tick: '', labels: sk.map(s => s[0]), unit: ' pts', min: sLo(sk.map(s => s[1])), max: sHi(sk.map(s => s[1])), series: [{ name: 'Change in share of postings, 2025 Q1 to 2026 Q3 (percentage points)', color: sk.map(s => CC[s[2]]), data: sk.map(s => s[1]) }], legend: LEG,
           title: `Change in the skills employers request in ${CX}`, sub: 'Share of LinkedIn job postings requesting each skill: change from 2025 Q1 to 2026 Q3, in percentage points', src: 'LinkedIn job postings (partnership data). Values are illustrative.', alt: `Diverging bar chart for ${CX}: change in the share of job postings requesting ten skills.` },
         D: { kind: 'bars', horizontal: true, signed: true, rowH: 38, tick: '', labels: cf.map(s => s[0]), unit: ' pts', min: sLo(cf.map(s => s[1])), max: sHi(cf.map(s => s[1])), series: [{ name: 'Change in share of certifications, 2025 Q1 to 2026 Q3 (percentage points)', color: cf.map(s => CC[s[2]]), data: cf.map(s => s[1]) }], legend: [{ name: 'AI skills', color: T.gray800 }, { name: 'Other fields', color: T.gray400 }],
           title: `Change in the fields people get certified in, ${CX}`, sub: 'Share of certifications and course completions in each field: change from 2025 Q1 to 2026 Q3, in percentage points', src: 'Coursera course completions and LinkedIn certifications (partnership data). Values are illustrative.', alt: `Diverging bar chart for ${CX}: change in the share of certifications by field, including AI skills.` },
-        noteA: { head: `AI is moving fastest into ${lcs(ch[0].l)}`, text: [`${ch[0].l} gained ${ch[0].d} points of work-related AI activity in ${CX} since 2025 Q1, and ${lcs(ch[1].l)} ${ch[1].d} points. ${A.labels[0]} still has the largest share (${u1[0]}%).`, 'A rising share shows where AI is becoming part of work, which is where curricula need to change first.'] },
+        noteA: { head: `AI is moving fastest into ${lcs(ch[0].l)}`, text: [`${ch[0].l} gained ${ch[0].d} points of work-related consumer AI activity in ${CX} since 2025 Q1, and ${lcs(ch[1].l)} ${ch[1].d} points. ${A.labels[0]} still has the largest share (${u1[0]}%).`, 'A rising share shows where AI is becoming part of work, which is where curricula need to change first.'] },
         noteB: { head: 'Where learners will meet AI at work', text: ['The activities at the top are where graduates are most likely to meet AI.', `${mhp}% of this occupation’s AI requests in ${CX} are at medium or high proficiency. The Index rates proficiency by occupational topic, not by activity.`] },
         noteC: { head: '', text: [] },
         noteD: { head: '', text: [] },
@@ -1232,11 +1249,11 @@ const QX = [
     fit: 'combined', g: { cons: 'c', api: 'a', ind: 'b', mod: 'a' }, supp: 'Developers and firm surveys',
     ask: ['In which industries is AI being built into products and workflows through the API, and how does that compare with consumer AI activity at work in the same industries?', 'Do API users build on open-source or proprietary models, and from which regions?', 'How large is the developer base, and what do firm surveys say about firms’ own AI use?'],
     scope: 'The Index sees API token volumes reported by coalition firms, by country and industry. A client can be a large firm, a small business or an individual developer, and the Index cannot tell them apart, so API use measures building with AI, not enterprise adoption.',
-    index: [{ k: 'c', t: 'Consumer activity at work by industry', d: '10 industry groups, work use type' }, { k: 'a', t: 'API usage volume by industry', d: 'share of API tokens, 10 industry groups' }, { k: 'a', t: 'Open-source vs proprietary model use', d: 'share of API tokens' }, { k: 'a', t: 'Region of origin of models used', d: 'share of API tokens' }],
+    index: [{ k: 'c', t: 'Consumer AI use at work by industry', d: '10 industry groups, work use type' }, { k: 'a', t: 'API token volume by industry', d: 'share of API tokens, 10 industry groups' }, { k: 'a', t: 'Open-source vs proprietary model use', d: 'share of API tokens' }, { k: 'a', t: 'Region of origin of models used', d: 'share of API tokens' }],
     supps: [{ t: 'GitHub Innovation Graph', d: 'developers active in the country, by quarter' }, { t: 'National enterprise ICT surveys', d: 'share of firms using AI, by size and sector, where they exist' }],
     also: [['GitHub Innovation Graph', 'https://github.com/github/innovationgraph', 'developers by economy and quarter; CC0'], ['Cetic.br ICT Enterprises 2024', QX_URL.cetic, 'Brazil: 13% of enterprises with 10+ employees used AI'], ['US Census Bureau BTOS', QX_URL.btos, 'biweekly; 19.8% of US businesses used AI as of 3 May 2026']],
     limits: ['Who the API user is. Tokens are reported by country and industry only: a large firm, a small business and an individual developer look the same.', 'How many firms use AI. Tokens measure volume, so one large client can dominate an industry; only a firm survey counts firms.', 'Country attribution. Tokens are assigned to a country by the reporting firms, so AI built abroad and used in Country X may not be counted here.', 'Consumer activity by industry covers the work use type only, and the live Index hides small cells.'],
-    use: ['Where API tokens concentrate in an industry, target guidance on data protection, procurement and liability at the firms and developers using the API there.', 'Where consumer activity at work runs well ahead of API use in an industry, consider guidance on acceptable use of AI tools at work in that industry.', 'If open-source models carry a rising share of tokens, access to compute and hosting matters more for who can build: review cloud-credit, data-residency and compute policy. Heavy reliance on models from one region is a resilience question to monitor.', 'To know how many firms use AI, and of what size, add an AI question to the national enterprise survey: tokens cannot count firms.'],
+    context: ['Guide support for small firms, based on how AI use and productivity vary by sector and firm size.', 'Assess how small businesses use consumer chat tools for business.'],
     build() {
       const D = { c: [24, 20, 11, 15, 12, 6], a: [38, 18, 21, 11, 5, 3] };
       const labels = ['Information and communication', 'Real estate, professional, scientific, technical and administrative', 'Financial and insurance activities', 'Trade, transport, accommodation and food', 'Education', 'Public administration'];
@@ -1246,8 +1263,8 @@ const QX = [
       return {
         title: `How does API use differ from consumer AI activity in ${CX}?`,
         chart: { kind: 'bars', horizontal: true, labels, unit: '%', max: qxNice([D.c, D.a], 10, 1.15), series: [{ name: 'Consumer activity at work: % of work-related consumer AI activity', color: 'consumer', data: D.c }, { name: 'API use: % of API tokens', color: 'api', data: D.a }],
-          title: `Where consumer activity and API use sit in ${CX}, by industry`, sub: 'Selected industry groups, latest quarter (%)', src: 'Index: consumer activity by industry (work use type); API usage volume by industry. Values are illustrative.', alt: `Horizontal bar chart for ${CX}: consumer activity at work and API use across six industry groups.` },
-        note: { head: `API use is concentrated in ${lcs(labels[ta])}`, text: [`${labels[ta]} accounts for ${D.a[ta]}% of API tokens in ${CX}, against ${D.c[ta]}% of consumer activity at work.`, `Consumer activity runs furthest ahead of API use in ${lcs(labels[ex])} (${D.c[ex]}% against ${D.a[ex]}%): people there use AI directly, while little is built on it through the API.`] },
+          title: `Where consumer AI use and API tokens sit in ${CX}, by industry`, sub: 'Selected industry groups, latest quarter (%)', src: 'Index: consumer AI use by industry (work use type); API token volume by industry. Values are illustrative.', alt: `Horizontal bar chart for ${CX}: consumer AI use at work and API tokens across six industry groups.` },
+        note: { head: `API use is concentrated in ${lcs(labels[ta])}`, text: [`${labels[ta]} accounts for ${D.a[ta]}% of API tokens in ${CX}, against ${D.c[ta]}% of consumer AI activity at work.`, `Consumer AI activity runs furthest ahead of API use in ${lcs(labels[ex])} (${D.c[ex]}% against ${D.a[ex]}%): people there use AI directly, while little is built on it through the API.`] },
         tiles: [{ v: os + '%', l: 'of API tokens go to open-source models', s: 'Index: open-source vs proprietary', k: 'a' }, { v: na + '%', l: 'of API tokens go to models of North American origin', s: 'Index: region of origin of models', k: 'a' }, { v: '84,000', l: 'developers active on GitHub in the latest quarter', s: 'GitHub Innovation Graph', k: 's' }, { v: '13%', l: 'of firms with 10 or more employees use AI (only where a national survey asks)', s: 'National enterprise ICT survey', k: 's' }]
       };
     }
@@ -1258,11 +1275,11 @@ const QX = [
     fit: 'combined', g: { cons: 'c', ind: 'c', lang: 'c' }, supp: 'Language data',
     ask: ['In which languages do people use AI?', 'How does the language of AI activity at work differ by industry, for example agriculture against health?', 'Where inside the country is AI used in regional languages?'],
     scope: 'Training-data availability is shown as context: it helps explain why a language’s share of AI activity is low, but it is not a measure of use.',
-    index: [{ k: 'c', t: 'Consumer activity by language', d: 'share of consumer AI activity in each language' }, { k: 'c', t: 'Consumer activity by language and industry', d: 'work use type, 10 industry groups; needs a new Index cut (part b)' }, { k: 'c', t: 'Consumer activity by language and district', d: 'needs a new Index cut (part c)' }],
+    index: [{ k: 'c', t: 'Consumer AI activity by language', d: 'share of consumer AI activity in each language' }, { k: 'c', t: 'Consumer AI activity by language and industry', d: 'work use type, 10 industry groups; needs a new Index cut (part b)' }, { k: 'c', t: 'Consumer AI activity by language and district', d: 'needs a new Index cut (part c)' }],
     supps: [{ t: 'Low-resource language index (World Bank)', d: 'availability of training data for AI models, by language; in development' }],
     also: [['DHS: native language of respondent', QX_URL.dhslang, 'example variable, Togo MIS 2017'], ['Afrobarometer: language spoken at home', QX_URL.afrolang, 'example variable, Eswatini 2021'], ['CLEAR Global language data', QX_URL.clear, 'compiles census, DHS and Afrobarometer; about 40 countries']],
     limits: ['Language detection. Language is identified automatically, and detection is weakest for low-resource languages and mixed-language messages, so their shares may be undercounted.', 'Activity is not people: heavy users count many times, so a language’s share of activity is not its share of users.', 'New cuts. The Index page reports language by country only; parts b and c show what language by industry and by district would add. Industry covers the work use type only.', 'Small districts. Cells below the minimum amount of activity are hidden, and these are often where regional languages dominate.', QX_SELECT],
-    use: ['Where an industry’s AI activity runs mostly in regional languages, AI tools and services for that industry (such as agricultural extension) must work in those languages: check training-data availability for them first.', 'Where an industry works mainly in English, people without English are left out of its AI tools: consider local-language support for client- and patient-facing uses.', 'Where a regional language has little training data, invest in data for it: text and speech collection and language data partnerships.', 'Use the district map to target language programs to the districts where regional languages carry most AI activity.'],
+    context: ['Prioritize local-language models where there are gaps in use and performance by language.', 'Inform language and inclusion policy, for example by building indigenous-language materials for teachers.'],
     build() {
       const L = ['National language', 'English', 'Regional language A', 'Regional language B', 'Other languages'], LC = [NAVY, RAMP[3], RAMP[2], RAMP[1], T.gray400];
       const c = [74, 14, 7, 2, 3], lr = [55, 98, 12, 4];
@@ -1273,17 +1290,17 @@ const QX = [
       const nm = a => { const ids = a.map(d => d.n.replace('District ', '')); return a.length === 1 ? a[0].n : 'Districts ' + ids.slice(0, -1).join(', ') + ' and ' + ids[ids.length - 1]; };
       return {
         title: `Which languages do people in ${CX} use with AI, and how does that differ by industry and across the country?`,
-        subA: 'Language of AI activity',
+        subA: 'Language of consumer AI activity',
         chart: { kind: 'bars', horizontal: true, rowH: 42, labels: L, unit: '%', max: qxNice([c], 10, 1.2), series: [{ name: 'Share of consumer AI activity (%)', color: 'consumer', data: c }],
-          title: `Language of AI activity in ${CX}`, sub: 'Share of consumer AI activity (%), latest quarter', src: 'Index: consumer activity by language. Values are illustrative.', alt: `Bar chart for ${CX}: share of consumer AI activity in each language.` },
+          title: `Language of consumer AI activity in ${CX}`, sub: 'Share of consumer AI activity (%), latest quarter', src: 'Index: consumer AI activity by language. Values are illustrative.', alt: `Bar chart for ${CX}: share of consumer AI activity in each language.` },
         note: { head: `${L[0]} carries most AI activity`, text: [`${c[0]}% of AI activity in ${CX} is in the national language and ${c[1]}% in English; regional languages together account for ${c[2] + c[3]}%.`, 'Where a census or DHS records home language, compare these shares with the share of people who speak each language at home.'] },
-        subB: 'By industry: language of AI activity at work, if the Index reports language by industry',
+        subB: 'By industry: language of work-related consumer AI activity, if the Index reports language by industry',
         chart2: { kind: 'bars', horizontal: true, stacked: true, labels: IN.map(x => x[0]), unit: '%', max: 100, noEnd: true, series: L.map((l, k) => ({ name: l, color: LC[k], data: IN.map(x => x[1][k]) })),
-          title: `Language of work-related AI activity in ${CX}, by industry`, sub: 'Share of each industry’s work-related consumer AI activity (%); each bar adds to 100', src: 'Index: consumer activity by language and industry, work use type (needs a new Index cut). Values are illustrative.', alt: `Stacked bar chart for ${CX}: language mix of work-related AI activity in eight industries.` },
-        note2: { head: `${IN[li][0]} runs most in regional languages; ${lcs(IN[ei2][0])} most in English`, text: [`In ${lcs(IN[li][0])}, ${loc[li]}% of work-related AI activity is in regional languages, against ${loc[ei2]}% in ${lcs(IN[ei2][0])}, where English accounts for ${en[ei2]}%. In health, English accounts for ${en[6]}%.`, 'Legal work sits inside professional services in the Index’s ten industry groups; the Legal occupational topic would isolate it.'] },
+          title: `Language of work-related consumer AI activity in ${CX}, by industry`, sub: 'Share of each industry’s work-related consumer AI activity (%); each bar adds to 100', src: 'Index: consumer AI activity by language and industry, work use type (needs a new Index cut). Values are illustrative.', alt: `Stacked bar chart for ${CX}: language mix of work-related consumer AI activity in eight industries.` },
+        note2: { head: `${IN[li][0]} runs most in regional languages; ${lcs(IN[ei2][0])} most in English`, text: [`In ${lcs(IN[li][0])}, ${loc[li]}% of work-related consumer AI activity is in regional languages, against ${loc[ei2]}% in ${lcs(IN[ei2][0])}, where English accounts for ${en[ei2]}%. In health, English accounts for ${en[6]}%.`, 'Legal work sits inside professional services in the Index’s ten industry groups; the Legal occupational topic would isolate it.'] },
         tilesHd: 'Barrier: training data available for each language',
         tiles: L.slice(0, 4).map((l, i) => ({ v: String(lr[i]), l: `${l}: training data availability score (0 to 100)`, s: 'World Bank low-resource language index (in development)', k: 's' })),
-        lmap: { map: M, src: 'Index: consumer activity by language and district (needs a new Index cut). Values are illustrative.',
+        lmap: { map: M, src: 'Index: consumer AI activity by language and district (needs a new Index cut). Values are illustrative.',
           note: { head: `Regional languages carry 40% or more of AI activity in ${hi.length} districts`, text: [`In ${nm(hi)}, 40% or more of AI activity is in a regional language: Regional language A in the north and west, Regional language B in the south.`, `${nm(hid)} ${hid.length > 1 ? 'are' : 'is'} hidden for too little activity; small rural districts are often where regional languages dominate.`] } }
       };
     }
@@ -1292,13 +1309,13 @@ const QX = [
   {
     asked: { Labor: 'OECD, IDB, IDB Invest, World Bank' },
     fit: 'combined', g: { use: 'c', act: 'c' }, supp: 'Labour and firm surveys',
-    ask: ['How much work-related AI activity goes to running a business: marketing, customers, planning, finance, pricing and paperwork?', 'Which of these activities are growing fastest?', 'What do labour and firm surveys say about how many people work for themselves, and how many firms of each size use AI?'],
+    ask: ['How much work-related consumer AI activity goes to running a business: marketing, customers, planning, finance, pricing and paperwork?', 'Which of these activities are growing fastest?', 'What do labour and firm surveys say about how many people work for themselves, and how many firms of each size use AI?'],
     scope: 'These activities are done in firms of every size. The Index cannot tell a sole trader from a large firm, so this shows how AI supports running a business, not SME adoption.',
-    index: [{ k: 'c', t: 'Use type: Work', d: 'AI activity related to a job' }, { k: 'c', t: 'Business-running work activities (O*NET IWAs)', d: 'e.g. Develop marketing or promotional materials; Respond to customer problems or inquiries; Calculate financial data. Annual by country' }],
+    index: [{ k: 'c', t: 'Use type: Work', d: 'work-related consumer AI activity' }, { k: 'c', t: 'Business-running work activities (O*NET IWAs)', d: 'e.g. Develop marketing or promotional materials; Respond to customer problems or inquiries; Calculate financial data. Annual by country' }],
     supps: [{ t: 'ILOSTAT', d: 'status in employment: own-account and contributing family workers' }, { t: 'National enterprise ICT surveys', d: 'share of firms using AI, by size class, where they exist' }],
     also: [['Cetic.br ICT Enterprises 2024', QX_URL.cetic, 'Brazil: AI use of 10%, 29% and 38% among small, medium and large enterprises'], ['US Census Bureau BTOS', QX_URL.btos, 'AI use by firm size and sector, biweekly']],
     limits: ['Firm size. The Index does not observe it, so business-running activity cannot be attributed to small firms.', 'Activity is not people: heavy users count many times, and employees of large firms do these activities too.', 'Timing. Enterprise surveys are irregular and labour force surveys lag; they are baselines, not quarterly series.', QX_MIN],
-    use: ['Build business-support programs (training, advisory services, toolkits) around the business-running activities where AI activity is largest and growing.', 'Where own-account and family work is a large share of employment, deliver that support through channels that reach the self-employed, such as business associations, microfinance providers and mobile services, not only through registered firms.', 'Where AI is used for contracts, applications and permits, check that government forms and guidance work for people preparing them with AI.', 'To know how many small firms use AI, add an AI question by firm size to the national enterprise survey: the Index cannot see firm size.'],
+    context: ['Guide support for small firms, based on how AI use and productivity vary by sector and firm size.', 'Inform SME policy in Latin America, where SME adoption is a key question.', 'Pilot for micro-entrepreneurs.'],
     build() {
       const A = [['Develop marketing or promotional materials', 2.1, 3.0], ['Respond to customer problems or inquiries', 1.8, 2.4], ['Advise others on business or operational matters', 1.2, 1.7], ['Analyze market or industry conditions', 1.0, 1.3], ['Develop business or marketing plans', 0.9, 1.4], ['Calculate financial data', 0.6, 0.8], ['Develop financial or business plans', 0.5, 0.6], ['Analyze business or financial data', 0.4, 0.6]];
       const t0 = r1(A.reduce((s, x) => s + x[1], 0)), t1 = r1(A.reduce((s, x) => s + x[2], 0));
@@ -1306,8 +1323,8 @@ const QX = [
       return {
         title: `How is AI used to run businesses in ${CX}?`,
         chart: { kind: 'bars', horizontal: true, labels: A.map(x => x[0]), unit: '%', max: qxNice([A.map(x => x[2])], 1, 1.2), series: [{ name: 'Year to 2025 Q4', color: RAMP[1], data: A.map(x => x[1]) }, { name: 'Year to 2026 Q3', color: 'consumer', data: A.map(x => x[2]) }],
-          title: `Business-running activities in work-related AI use in ${CX}`, sub: 'Share of work-related consumer AI activity (%), by O*NET intermediate work activity; four quarters pooled', src: 'Index: work use type, O*NET intermediate work activities. Values are illustrative.', alt: `Horizontal bar chart for ${CX}: eight business-running work activities, share of work-related AI activity in the years to 2025 Q4 and 2026 Q3.` },
-        note: { head: `Business-running activities are ${t1}% of work-related AI activity`, text: [`Together these eight activities went from ${t0}% to ${t1}% of work-related AI activity in ${CX}, comparing the years to 2025 Q4 and 2026 Q3. Marketing materials and customer inquiries are the largest; “${A[gi][0]}” grew fastest (+${g[gi]}%).`, 'This covers firms of every size; it is not a measure of SMEs.'] },
+          title: `Business-running activities in work-related consumer AI activity in ${CX}`, sub: 'Share of work-related consumer AI activity (%), by O*NET intermediate work activity; four quarters pooled', src: 'Index: work use type, O*NET intermediate work activities. Values are illustrative.', alt: `Horizontal bar chart for ${CX}: eight business-running work activities, share of work-related consumer AI activity in the years to 2025 Q4 and 2026 Q3.` },
+        note: { head: `Business-running activities are ${t1}% of work-related consumer AI activity`, text: [`Together these eight activities went from ${t0}% to ${t1}% of work-related consumer AI activity in ${CX}, comparing the years to 2025 Q4 and 2026 Q3. Marketing materials and customer inquiries are the largest; “${A[gi][0]}” grew fastest (+${g[gi]}%).`, 'This covers firms of every size; it is not a measure of SMEs.'] },
         tiles: [{ v: own + '%', l: 'of employed people are own-account or contributing family workers', s: 'ILOSTAT, status in employment, latest year', k: 's' }, { v: '10% / 38%', l: 'of small / large firms use AI (only where a national enterprise survey asks)', s: 'National enterprise ICT survey', k: 's' }]
       };
     }
@@ -1316,13 +1333,13 @@ const QX = [
   {
     asked: { Digital: 'EBRD, CAF', Education: 'World Bank, ADB, IDB, AfDB', Labor: 'UNDP, IMF' },
     fit: 'combined', g: { cons: 'c', api: 'a', use: 'c', act: 'c', ind: 'b' }, supp: 'Digital government',
-    ask: ['How much API use is classified to public administration, and is it growing?', 'What is work-related AI activity in public administration about?', 'How much do people use AI to deal with forms, permits and public information?'],
+    ask: ['How much API use is classified to public administration, and is it growing?', 'What is work-related consumer AI activity in public administration about?', 'How much do people use AI to deal with forms, permits and public information?'],
     scope: 'Parts a and b use the Index’s public administration industry, which classifies activity by what it is about, not by who the user is. Part c is a proxy: the Index does not yet identify activity in which a person is dealing with a government service.',
-    index: [{ k: 'a', t: 'API usage volume by industry', d: 'public administration' }, { k: 'c', t: 'Consumer activity at work by industry and work activity', d: 'public administration' }, { k: 'c', t: 'Personal use by work activity', d: 'paperwork and rules activities (proxy, part c); by region, too rare to report by country' }, { k: 'b', t: 'Regional and world averages', d: 'the same measures, for comparison' }],
+    index: [{ k: 'a', t: 'API token volume by industry', d: 'public administration' }, { k: 'c', t: 'Consumer AI activity at work by industry and work activity', d: 'public administration' }, { k: 'c', t: 'Personal consumer AI activity by work activity', d: 'paperwork and rules activities (proxy, part c); by region, too rare to report by country' }, { k: 'b', t: 'Regional and world aggregates', d: 'the same measures, for comparison' }],
     supps: [{ t: 'UN E-Government Survey', d: 'E-Government Development Index: how far services are online; biennial' }, { t: 'World Bank GovTech Maturity Index', d: 'government digital systems and services; 2025 update' }, { t: 'Worldwide Bureaucracy Indicators', d: 'public sector employment' }],
     also: [['UN E-Government Survey 2024', QX_URL.egdi, 'E-Government Development Index'], ['GovTech Maturity Index 2025', QX_URL.gtmi, 'World Bank'], ['Worldwide Bureaucracy Indicators', QX_URL.wwbi, 'World Bank data catalog']],
     limits: ['Who builds for government. Services built by contractors may be counted under information and communication or professional services, not public administration.', 'Citizen-facing or internal. API tokens cannot separate services for the public from back-office use.', 'People dealing with government. Part c is a proxy: the paperwork activity also covers private contracts, and most information-seeking falls under a broad “Getting information” activity. A direct measure needs a new Index classifier.', 'Who the user is. Industry is assigned from what the activity is about, so part b is not a measure of civil servants: it can include contractors, consultants and citizens doing administrative work, and public teachers and health workers fall under their own industries.', QX_MIN],
-    use: ['If public administration’s share of API tokens is rising, AI is increasingly being built into public-administration services or systems, by government or its suppliers: put procurement, data-protection and accountability rules in place for AI-enabled services.', 'Use the activity mix in public administration to target guidance and approved tools for government staff at the tasks where AI is already used, such as record-keeping or communicating with the public.', 'If people increasingly use AI for forms and permits, simplify those forms and publish clear, machine-readable guidance, so AI-assisted applications are accurate.', 'Read the E-Government and GovTech scores alongside: AI services build on digital services that already work.'],
+    use: ['If public administration’s share of API tokens is rising that might indicate an increase on AI usage in the public sector.', 'Use the activity mix in public administration to target guidance and approved tools for government staff at the tasks where AI is already used, such as record-keeping or communicating with the public.'],
     build() {
       const ap = trend('q8a', 18, 31).map(v => r1(v / 10)), ar = trend('q8r', 15, 22).map(v => r1(v / 10)), aw = trend('q8w', 26, 34).map(v => r1(v / 10)), L = ap.length - 1;
       const PA = [['Documenting/recording information', 22], ['Communicating with people outside the organization', 18], ['Getting information', 16], ['Interpreting the meaning of information for others', 12], ['Evaluating information to determine compliance with standards', 9], ['Analyzing data or information', 8]];
@@ -1331,16 +1348,16 @@ const QX = [
         title: `How is AI being used in and for public services in ${CX}?`,
         subA: 'Building on AI: public administration’s share of API tokens',
         chart: { kind: 'line', labels: QUARTERS, unit: '%', ymin: 0, yl: 'Share of API tokens (%)', series: [{ name: CX, color: 'api', data: ap }, { name: 'Regional average', color: '#f2b38f', data: ar, dash: true }, { name: 'World average', color: T.gray400, data: aw, dash: true }],
-          title: `Public administration: share of API tokens, ${CX}`, sub: 'By quarter (%), against the regional and world averages', src: 'Index: API usage volume by industry; regional and world averages. Values are illustrative.', alt: `Line chart: public administration’s share of API tokens in ${CX}, the region and the world, by quarter.` },
+          title: `Public administration: share of API tokens, ${CX}`, sub: 'By quarter (%), against regional and world aggregates', src: 'Index: API token volume by industry; regional and world aggregates. Values are illustrative.', alt: `Line chart: public administration’s share of API tokens in ${CX}, the region and the world, by quarter.` },
         note: { head: ap[L] > ap[0] ? 'API use in public administration is rising' : 'API use in public administration is not rising', text: [`Public administration’s share of API tokens in ${CX} went from ${ap[0]}% to ${ap[L]}%, against ${ar[L]}% for the region and ${aw[L]}% for the world in the latest quarter.`, 'Tokens do not show whether these are services for the public or internal systems.'] },
-        subB: 'What work-related AI activity in public administration is about',
+        subB: 'What work-related consumer AI activity in public administration is about',
         chart2: { kind: 'bars', horizontal: true, labels: PA.map(x => x[0]), unit: '%', max: qxNice([PA.map(x => x[1])], 5, 1.2), series: [{ name: 'Share of work-related consumer AI activity classified to public administration (%)', color: 'consumer', data: PA.map(x => x[1]) }],
-          title: `Work-related AI activity in public administration in ${CX}, by work activity`, sub: 'Share of work-related consumer AI activity classified to public administration (%), six largest O*NET general work activities', src: 'Index: consumer activity at work, public administration, by work activity. Values are illustrative.', alt: `Bar chart for ${CX}: six work activities by share of work-related AI activity classified to public administration.` },
-        note2: { head: 'Record-keeping and outside communication lead', text: [`${PA[0][0]} and ${lcs(PA[1][0])} account for ${PA[0][1] + PA[1][1]}% of work-related AI activity classified to public administration in ${CX}.`, 'Industry is assigned from what the activity is about, so this describes public-administration work, not civil servants as such.'] },
-        subC: 'Citizens dealing with government: a proxy, for the region',
-        chart3: { kind: 'line', labels: QUARTERS, unit: '%', ymin: 0, yl: 'Share of personal AI activity (%)', series: [{ name: 'Prepare documentation for contracts, applications, or permits', color: 'consumer', data: pp }, { name: 'Explain regulations, policies, or procedures', color: RAMP[2], data: pr, dash: true }],
-          title: `Paperwork and rules in personal AI use, ${CX}’s region`, sub: 'Share of personal consumer AI activity (%), by quarter, all countries in the region pooled', src: 'Index: personal use type, O*NET intermediate work activities (proxy), regional aggregate; too rare to report by country. Values are illustrative.', alt: `Line chart for ${CX}’s region: two paperwork-related activities as a share of personal AI activity, by quarter.` },
-        note3: { head: pp[L] > pp[0] ? 'People use AI more for applications and permits' : 'Use of AI for applications and permits is flat', text: [`Across ${CX}’s region, preparing documentation for contracts, applications or permits went from ${pp[0]}% to ${pp[L]}% of personal AI activity. Too few such conversations are sampled to report it for ${CX} alone.`, 'This mixes government forms with private contracts. A new Index classifier for activity involving a government service would measure it directly.'] },
+          title: `Work-related consumer AI activity in public administration in ${CX}, by work activity`, sub: 'Share of work-related consumer AI activity classified to public administration (%), six largest O*NET general work activities', src: 'Index: work-related consumer AI activity by industry and work activity. Values are illustrative.', alt: `Bar chart for ${CX}: six work activities by share of work-related consumer AI activity classified to public administration.` },
+        note2: { head: 'Record-keeping and outside communication lead', text: [`${PA[0][0]} and ${lcs(PA[1][0])} account for ${PA[0][1] + PA[1][1]}% of work-related consumer AI activity classified to public administration in ${CX}.`, 'Industry is assigned from what the activity is about, so this describes public-administration work, not civil servants as such.'] },
+        subC: 'Personal consumer AI activity related to government: a regional proxy',
+        chart3: { kind: 'line', labels: QUARTERS, unit: '%', ymin: 0, yl: 'Share of personal consumer AI activity (%)', series: [{ name: 'Prepare documentation for contracts, applications, or permits', color: 'consumer', data: pp }, { name: 'Explain regulations, policies, or procedures', color: RAMP[2], data: pr, dash: true }],
+          title: `Paperwork and rules in personal consumer AI activity, ${CX}’s region`, sub: 'Share of personal consumer AI activity (%), by quarter, all countries in the region pooled', src: 'Index: personal consumer AI activity by work activity (proxy), regional aggregate; too rare to report by country. Values are illustrative.', alt: `Line chart for ${CX}’s region: two paperwork-related activities as a share of personal consumer AI activity, by quarter.` },
+        note3: { head: pp[L] > pp[0] ? 'Consumer AI activity for applications and permits is growing' : 'Consumer AI activity for applications and permits is flat', text: [`Across ${CX}’s region, preparing documentation for contracts, applications or permits went from ${pp[0]}% to ${pp[L]}% of personal consumer AI activity. Too few such consumer AI interactions are sampled to report it for ${CX} alone.`, 'This mixes government forms with private contracts. A new Index classifier for activity involving a government service would measure it directly.'] },
         tiles: [{ v: '0.62', l: 'E-Government Development Index score (0 to 1)', s: 'UN E-Government Survey, latest edition', k: 's' }, { v: 'Group B', l: 'GovTech Maturity Index group (A highest, D lowest)', s: 'World Bank GovTech Maturity Index 2025', k: 's' }, { v: '14%', l: 'of paid employment is in the public sector', s: 'Worldwide Bureaucracy Indicators', k: 's' }]
       };
     }
@@ -1351,11 +1368,11 @@ const QX = [
     fit: 'combined', g: { use: 'c', occ: 'c' }, supp: 'Exposure and employment',
     ask: ['Which occupations in Country X are most exposed to generative AI?', 'Is AI activity at work concentrated in the most exposed occupations, or are some exposed occupations barely using it?', 'How many workers are in the occupations the ILO rates most exposed?'],
     scope: 'Exposure measures what generative AI could do in an occupation, not what is happening. Each Index occupational topic is defined as a set of ISCO-08 codes, the classification the ILO scores, so each topic gets an exposure score averaged from its occupations and weighted by employment.',
-    index: [{ k: 'c', t: 'Use type: Work', d: 'AI activity related to a job' }, { k: 'c', t: 'Occupational topic', d: '15 topics, each defined as a set of ISCO-08 codes' }],
+    index: [{ k: 'c', t: 'Use type: Work', d: 'work-related consumer AI activity' }, { k: 'c', t: 'Occupational topic', d: '15 topics, each defined as a set of ISCO-08 codes' }],
     supps: [{ t: 'ILO generative AI exposure index (2025)', d: 'exposure score for each ISCO-08 occupation, from task-level ratings' }, { t: 'ILOSTAT and labour force survey microdata', d: 'employment by occupation (2-digit, and 3- or 4-digit where needed), to weight scores and size the workforce' }],
     also: [['ILO Working Paper 140', QX_URL.ilo140, 'Generative AI and jobs: a refined global index of occupational exposure, 2025']],
     limits: ['What will happen. Exposure is potential, not a forecast, and high AI activity is not evidence of job loss or productivity gain.', 'Activity is not people: heavy users count many times, so a large share of AI activity can come from a few intensive users.', 'Content, not workers. ILO exposure describes the tasks of workers in an occupation; the Index assigns a topic from what the activity is about, not who the user is. The comparison is occupational content against occupational exposure.', 'Weights. Most topics can be weighted with ILOSTAT’s 2-digit tables, but Legal, Social science and Writing are defined at 3 or 4 digits and need labour force survey microdata.', 'Broad topics. Six topics are whole ISCO major groups, so one average can hide very different jobs, such as cashiers and cooks in Service and sales.', QX_SELECT],
-    use: ['Where exposure is high and AI activity is substantial, prioritize curriculum review and workplace guidance (see Question 3).', 'Where exposure is high but AI activity is low, find out why before acting: access, tools in local languages or employer practice. Watch these occupations for retraining needs.', 'Size retraining and transition programs against employment in the ILO’s highest exposure gradients (ILOSTAT).'],
+    use: ['Size retraining and transition programs against employment in the ILO’s highest exposure gradients (ILOSTAT).'],
     build() {
       const O = ['Management', 'Science and engineering', 'Health', 'Teaching', 'Business and administration', 'Information and communications technology', 'Legal', 'Social science, counselling, and religion', 'Writing, translation, and the arts', 'Clerical support', 'Service and sales', 'Skilled agricultural, forestry, and fishery', 'Craft and related trades', 'Plant and machine operations and assembly', 'Elementary tasks'];
       const SH = ['Management', 'Science and eng.', 'Health', 'Teaching', 'Business and admin.', 'ICT', 'Legal', 'Social sci., counselling', 'Writing and arts', 'Clerical support', 'Service and sales', 'Agriculture', 'Craft and trades', 'Plant operators', ''];
@@ -1363,11 +1380,11 @@ const QX = [
       const col = i => MCOL.consumer;
       return {
         title: `Are the occupations most exposed to AI in ${CX} actually using it?`,
-        chart: { kind: 'scatter', h: 440, title: `Exposure to generative AI against AI activity at work in ${CX}, by occupation`, sub: 'Each circle is an occupation; its size shows its share of employment. Larger occupations tend to have more AI activity simply because more people work in them.', src: 'ILO generative AI exposure index (2025), averaged to Index topics with ILOSTAT employment weights; Index: work use type, occupational topics. Values are illustrative.', alt: `Scatter plot for ${CX}: ILO exposure score against share of work-related AI activity for the 15 occupational topics, sized by employment.`,
-          xl: 'ILO exposure score (0 to 1)', yl: 'Share of work-related AI activity (%)', xmin: 0, xmax: 0.7, tip: p => ` ${p.n}: exposure ${p.x}, ${p.y}% of AI activity, ${p.e}% of employment`,
+        chart: { kind: 'scatter', h: 440, title: `Exposure to generative AI against consumer AI activity at work in ${CX}, by occupation`, sub: 'Each circle is an occupation; its size shows its share of employment. Larger occupations tend to have more AI activity simply because more people work in them.', src: 'ILO generative AI exposure index (2025), averaged to Index topics with ILOSTAT employment weights; Index: work use type, occupational topics. Values are illustrative.', alt: `Scatter plot for ${CX}: ILO exposure score against share of work-related consumer AI activity for the 15 occupational topics, sized by employment.`,
+          xl: 'ILO exposure score (0 to 1)', yl: 'Share of work-related consumer AI activity (%)', xmin: 0, xmax: 0.7, tip: p => ` ${p.n}: exposure ${p.x}, ${p.y}% of consumer AI activity, ${p.e}% of employment`,
           pts: O.map((o, i) => ({ x: ex[i], y: use[i], n: o, s: SH[i], e: emp[i], c: col(i), r: 5 + Math.sqrt(emp[i]) * 3, al: i === 10 ? 'L' : i === 11 ? 'T' : '' })),
           legend: [{ name: 'Occupational topic (circle size: share of employment)', color: MCOL.consumer }],
-          labels: O, unit: '', series: [{ name: 'ILO exposure score', data: ex }, { name: 'Share of work-related AI activity (%)', data: use }, { name: 'Share of employment (%)', data: emp }] },
+          labels: O, unit: '', series: [{ name: 'ILO exposure score', data: ex }, { name: 'Share of work-related consumer AI activity (%)', data: use }, { name: 'Share of employment (%)', data: emp }] },
         note: { head: '', text: [] },
         tiles: [{ v: '7%', l: 'of employment is in occupations in the ILO’s highest exposure gradient', s: 'ILO generative AI exposure index (2025), ILOSTAT', k: 's' }]
       };
@@ -1498,7 +1515,7 @@ function qxTiles(ts, hd) {
 }
 function qxBody(i) {
   const q = QX[i], b = q.build(), w = q.worked ? QX_W3 : null;
-  const asked = Object.keys(q.asked).map(k => `<span><b>${k}</b> ${esc(q.asked[k])}</span>`).join('');
+  const asked = Object.keys(q.asked).map(k => `<span><b>${esc(k)}</b></span>`).join('');
   const li = (sq, t, d) => `<li class="qx-li">${sq}<span><span class="qx-lt">${esc(t)}</span>${d ? `<span class="qx-ld">${esc(d)}</span>` : ''}</span></li>`;
   const idx = q.index.map(x => li(qxSq(x.k, 14), x.t, x.d)).join('');
   const sup = w ? w.cards.map(d => `<li class="qx-dc"><div class="qx-dch">${qxSq('s', 14)}<b>${esc(d.n)}</b><span class="qx-tag">${esc(d.tag)}</span></div><p>${esc(d.m)}</p>${d.w ? `<p class="qx-wo"><b>Note:</b> ${esc(d.w)}</p>` : ''}<div class="qx-lk">${qxLinks(d.links)}</div></li>`).join('')
@@ -1519,7 +1536,7 @@ function qxBody(i) {
       <div class="qx-answer">${qxChartBox(b.D, 'qx-canvas6')}${qxRead(b.noteD)}</div>
 `;
   } else {
-    step3 = b.chart2 ? `<div class="qx-sub"><span class="qx-subn">a</span>${esc(b.subA)}</div><div class="qx-answer">${qxChartBox(b.chart, 'qx-canvas')}${qxRead(b.note)}</div><div class="qx-sub"><span class="qx-subn">b</span>${esc(b.subB)}</div><div class="qx-answer">${qxChartBox(b.chart2, 'qx-canvas2')}${qxRead(b.note2)}</div>${b.chart3 ? `<div class="qx-sub"><span class="qx-subn">c</span>${esc(b.subC)}</div><div class="qx-answer">${qxChartBox(b.chart3, 'qx-canvas8')}${qxRead(b.note3)}</div>` : ''}${qxTiles(b.tiles, b.tilesHd)}${b.lmap ? `<div class="qx-sub"><span class="qx-subn">c</span>Across the country, if the Index reports language by district</div><div class="qx-answer">${qxLangMap(b.lmap)}${qxRead(b.lmap.note)}</div>` : ''}`
+    step3 = b.chart2 ? `<div class="qx-sub"><span class="qx-subn">a</span>${esc(b.subA)}</div><div class="qx-answer">${qxChartBox(b.chart, 'qx-canvas')}${qxRead(b.note)}</div><div class="qx-sub"><span class="qx-subn">b</span>${esc(b.subB)}</div><div class="qx-answer">${qxChartBox(b.chart2, 'qx-canvas2')}${qxRead(b.note2)}</div>${b.chart3 ? `<div class="qx-sub"><span class="qx-subn">c</span>${esc(b.subC)}</div><div class="qx-answer">${qxChartBox(b.chart3, 'qx-canvas8')}${qxRead(b.note3)}</div>` : ''}${qxTiles(b.tiles, b.tilesHd)}${b.lmap ? `<div class="qx-sub"><span class="qx-subn">c</span>Where consumer AI activity uses regional languages, if the Index reports language by district</div><div class="qx-answer">${qxLangMap(b.lmap)}${qxRead(b.lmap.note)}</div>` : ''}`
       : b.sub ? `<div class="qx-sub"><span class="qx-subn">a</span>Where the gap is: from population to AI use</div><div class="qx-answer">${qxChartBox(b.chart, 'qx-canvas')}${qxRead(b.note)}</div>${qxTiles(b.tiles)}${qxSubnat(b.sub)}`
       : `<div class="qx-answer">${qxChartBox(b.chart, 'qx-canvas')}${qxRead(b.note)}</div>${qxTiles(b.tiles)}`;
   }
@@ -1530,23 +1547,21 @@ function qxBody(i) {
   <article class="qx-card">
     <div class="qx-qhead">
       <div class="qx-kick"><span>Question ${i + 1} of ${QX.length}</span>${qxFitChip(q.fit)}</div>
-      <h2 class="qx-h2">${esc(b.title)}</h2>
-      <div class="qx-asked"><span class="qx-askl">Asked by</span>${asked}</div>
     </div>
-    <section class="qx-step"><div class="qx-sh"><span class="qx-num">1</span><h3>What we ask of the data</h3></div>
-      <ul class="qx-asks">${q.ask.map(a => `<li>${esc(a)}</li>`).join('')}</ul>${q.scope ? `<p class="qx-nu">${esc(q.scope)}</p>` : ''}</section>
-    <section class="qx-step"><div class="qx-sh"><span class="qx-num">2</span><h3>Data we combine</h3></div>
+    <section class="qx-step"><div class="qx-sh"><span class="qx-num">1</span><h3>Questions identified by stakeholders</h3></div>
+      <h2 class="qx-h2">${esc(b.title)}</h2>
+      <div class="qx-asked"><span class="qx-askl">Asked by</span>${asked}</div></section>
+    <section class="qx-step"><div class="qx-sh"><span class="qx-num">2</span><h3>Investments and decisions these questions are useful for</h3></div>
+      <h4 class="qx-context-h">Context and potential impact</h4><ul class="qx-bul">${(q.context || q.use || b.use).map(u => `<li>${esc(u)}</li>`).join('')}</ul></section>
+    <section class="qx-step"><div class="qx-sh"><span class="qx-num">3</span><h3>Data we can combine</h3></div>
       <div class="qx-combine">
         <div class="qx-panel qx-p-idx"><h4>From the Index</h4><ul class="qx-ul">${idx}</ul></div>
         <div class="qx-plus" aria-hidden="true">+</div>
         <div class="qx-panel qx-p-sup"><h4>Supplemental data</h4><ul class="qx-ul">${sup}</ul></div>
       </div>${also}</section>
-    <section class="qx-step"><div class="qx-sh"><span class="qx-num">3</span><h3>What the answer looks like in ${CX}</h3><span class="qx-ill">Illustrative</span></div>${step3}</section>
-    <section class="qx-step"><div class="qx-sh"><span class="qx-num">4</span><h3>What a decision-maker in ${CX} could do with it</h3></div>
-      <div class="qx-two">
-        <div><ul class="qx-bul">${(q.use || b.use).map(u => `<li>${esc(u)}</li>`).join('')}</ul></div>
-        <div class="qx-lim"><h4>What the Index cannot tell you</h4><ul class="qx-bul qx-bul-g">${q.limits.map(u => `<li>${esc(u)}</li>`).join('')}</ul></div>
-      </div></section>${src}
+    <section class="qx-step"><div class="qx-sh"><span class="qx-num">4</span><h3>What the data can answer</h3></div>
+      <ul class="qx-asks">${q.ask.map(a => `<li>${esc(a)}</li>`).join('')}</ul>
+      <div class="qx-outputhead"><h4>Illustrative output for ${esc(CX)}</h4><span class="qx-ill">Illustrative</span></div>${step3}</section>${src}
     <div class="qx-nav">
       <button type="button" class="qx-navbtn" data-qx-go="-1"><i class="loop loop-angle-left" aria-hidden="true"></i> Previous question</button>
       <span class="qx-fitnote">${esc(QX_FIT[q.fit][0])}: ${esc(QX_FIT[q.fit][1])}</span>
@@ -1636,9 +1651,9 @@ function init(root) {
   const profFeats = features.filter(f => PROFILE[f.properties.name]);
   [['#fff', 4], [HILITE, 1.75]].forEach(([col, w]) => svg.append('g').attr('pointer-events', 'none').selectAll('path').data(profFeats).join('path').attr('d', path).attr('fill', 'none').attr('stroke', col).attr('stroke-width', w).attr('stroke-linejoin', 'round'));
   paths.on('mousemove', (ev, d) => {
-    const n = d.properties.name, v = mapState.values && mapState.values[n];
-    tip.innerHTML = `<strong>${esc(n)}</strong><br>` + (v == null ? 'No data' :
-      `${IND.consumer}: ${mapState.vc[n]}<br>${IND.api}: ${mapState.va[n]}` +
+    const n = d.properties.name, decile = mapState.deciles && mapState.deciles[mapState.ind][n];
+    tip.innerHTML = `<strong>${esc(n)}</strong><br>` + (decile == null ? 'No data' :
+      `${esc(IND[mapState.ind])}: decile ${decile}` +
       (PROFILE[n] ? '<br><em>Click to open the country profile</em>' : ''));
     const r = mapEl.getBoundingClientRect();
     tip.style.display = 'block';
@@ -1662,10 +1677,10 @@ function init(root) {
   selQ.innerHTML = QUARTERS.map((q, i) => `<option value="${i}">${q}</option>`).join('');
   selQ.value = QUARTERS.length - 1;
 
-  // normalization is shared by the map and the Comparisons section: the two selectors stay in step
   if (MAIN) {
   selInd.addEventListener('change', () => renderMap(root));
   selCor.addEventListener('change', () => renderComparisons(root));
+  // normalization is shared by the map and the Comparisons section: the two selectors stay in step
   [[selNorm, selNormCmp], [selNormCmp, selNorm]].forEach(([from, to]) => from.addEventListener('change', () => { to.value = from.value; renderMap(root); renderComparisons(root); }));
   }
   [selCountry, selQ].forEach(s => s.addEventListener('change', () => renderCountry(root)));
@@ -1686,13 +1701,17 @@ function init(root) {
   waBtn.addEventListener('click', () => { const on = waTab.style.display === 'none'; waTab.style.display = on ? 'block' : 'none'; waBtn.setAttribute('aria-expanded', String(on)); waBtn.textContent = on ? 'Hide table' : 'Table'; });
   root.querySelector('#sel-occ-topic').addEventListener('change', ev => { occSel = ev.target.value; const code = selCountry.value; renderOccActivities(root, code, sortDesc(TOPICS, shares(code + selQ.value + 'topic', TOPICS, TOPIC_W, C[code].tilt))[0]); tblSync(root, '#occ-table', OCC_TABS); });
   [['#wa-table', WA_TABS], ['#occ-table', OCC_TABS]].forEach(([host, map]) => Object.keys(map).forEach(id => new MutationObserver(() => tblSync(root, host, map)).observe(root.querySelector('#' + id), { attributes: true, attributeFilter: ['aria-selected'] })));
-  [['occ', 'Table'], ['ind10', 'Table']].forEach(([id]) => {
+  [['occ', 'Table']].forEach(([id]) => {
+    const b = root.querySelector('#' + id + '-table-btn'), t = root.querySelector('#' + id + '-table');
+    b.addEventListener('click', () => { const on = t.style.display === 'none'; t.style.display = on ? 'block' : 'none'; b.setAttribute('aria-expanded', String(on)); b.textContent = on ? 'Hide table' : 'Table'; });
+  });
+  [['ind10-growth', 'Growth index table'], ['ind10-rank', 'Rank index table']].forEach(([id]) => {
     const b = root.querySelector('#' + id + '-table-btn'), t = root.querySelector('#' + id + '-table');
     b.addEventListener('click', () => { const on = t.style.display === 'none'; t.style.display = on ? 'block' : 'none'; b.setAttribute('aria-expanded', String(on)); b.textContent = on ? 'Hide table' : 'Table'; });
   });
   { const b = root.querySelector('#indc-table-btn'), t = root.querySelector('#indc-table');
     b.addEventListener('click', () => { const on = t.style.display === 'none'; t.style.display = on ? 'block' : 'none'; b.setAttribute('aria-expanded', String(on)); b.textContent = on ? 'Hide table' : 'Table'; });
-    ['#sel-ict-use', '#sel-ict-view'].forEach(sel => root.querySelector(sel).addEventListener('change', () => { const code = selCountry.value; renderIndustryCross(root, code + selQ.value, C[code], IND10C_W); })); }
+    root.querySelector('#sel-ict-view').addEventListener('change', () => { const code = selCountry.value; renderIndustryCross(root, code + selQ.value, C[code], IND10C_W); }); }
   const selBenchInd = root.querySelector('#sel-ind-bench');
   selBenchInd.innerHTML = BENCH_INDUSTRIES.map((n, i) => `<option value="${i}">${esc(n)}</option>`).join('');
   selBenchInd.addEventListener('change', () => { const code = selCountry.value; renderBenchmark(root, code, C[code], +selQ.value); });
